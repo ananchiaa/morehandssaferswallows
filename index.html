@@ -108,6 +108,10 @@ details summary{font-weight:800;cursor:pointer;font-size:.9rem}
 .alertbox{background:var(--surface);border-left:4px solid var(--stop);padding:8px 10px;border-radius:0 8px 8px 0}
 .warnbox{background:var(--surface);border-left:4px solid var(--amber);padding:8px 10px;border-radius:0 8px 8px 0}
 .resline{font-family:ui-monospace,Menlo,monospace;font-size:.85rem;background:var(--wash);border-radius:8px;padding:8px 10px;overflow-wrap:anywhere}
+.past{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.past>summary{padding:12px 16px;font-weight:800;cursor:pointer;color:var(--deep)}
+.past[open]>summary{border-bottom:1px solid var(--line)}
+.past>.panel{border:0;border-radius:0 0 14px 14px}
 .score{font-variant-numeric:tabular-nums;font-weight:800}
 .try{background:var(--surface);border-radius:10px;padding:8px 10px;font-style:italic}
 .big{font-family:var(--display);font-size:3rem;color:var(--deep);line-height:1}
@@ -290,15 +294,15 @@ function finish(ctl){
 }
 
 /* ---------- offline marking guide ---------- */
-const NS = ["not suitable","not fit","not well enough","no exercise today","cannot do exercise","can't do exercise"];
+const NS = ["no suitable","cannot do","no do","dont do","today no","not suitable","not fit","not well enough","no exercise today","cannot do exercise","can't do exercise"];
 const W = {
-  stop:["not suitable","not fit","stop","pause","no more","end the session","end here","finish here","enough for today","not continue"],
-  noStart:["not suitable","not fit","not well enough","not start","don't start","dont start","won't start","wont start","not going to start","not doing","not do the","not do her","not do his","hold off","withhold","skip","postpone","cancel","no session","no exercise","not today"],
-  nurse:["nurse","sister","staff nurse","nic","in charge"],
+  stop:["not suitable","not fit","stop","enough already","no more already","finish already","dont do already","cannot continue","cannot do already","no continue","no need continue","pause","no more","end the session","end here","finish here","enough for today","not continue"],
+  noStart:["not suitable","not fit","not well enough","no suitable","cannot do","no can do","no do","dont do","no need do","today no","no exercise","cannot start","not start","don't start","dont start","won't start","wont start","not going to start","not doing","not do the","not do her","not do his","hold off","withhold","skip","postpone","cancel","no session","no exercise","not today"],
+  nurse:["sis","nurse","sister","staff nurse","nic","in charge"],
   doc:["document","record","write","chart","note it","notes","notes","report form","log it"],
   st:["speech therap","therapist"," st ","st's","the st","st to","review"],
-  praise:["good","well done","very good","great","excellent","that's it","thats it","nice","bagus","steady"],
-  perm:["can i","may i","is it ok","is it okay","is that ok","is that okay","okay?","ok?","can or not","alright?","shall we","are you ready","ready?","can we","you ok with","do you mind","agree"],
+  praise:["good","power","shiok","clever","pandai","good job","well done","very good","great","excellent","that's it","thats it","nice","bagus","steady"],
+  perm:["ok","okay","can?","alright","ok or not","okay or not","can or not","ok ah","okay ah","can ah","ok lah?","is it ok","can we start","start ok","can i","may i","is it ok","is it okay","is that ok","is that okay","okay?","ok?","can or not","alright?","shall we","are you ready","ready?","can we","you ok with","do you mind","agree"],
   demo:["like me","watch me","like this","follow me","see me","copy me","look at me","i show you","let me show"],
   jargon:["tts","thermal","tactile","palatoglossal","faucial","anterior","aspirat","bolus","pharyn","laryn","oral motor","ome","ctar","csp","resistance","dysphag","sustained","repetitions","reps"],
   calm:["calm","relax","it's okay","its okay","don't worry","dont worry","never mind","it's alright","take your time","slowly"]
@@ -307,17 +311,15 @@ const k = (label, any, tip, opt={}) => ({label, any, tip, ...opt});
 const RUB = {
  "a.escalate":{
   checks:[k("Tell the nurse: not suitable for exercise today",W.noStart,"Tell the nurse: 'Mdm A is not suitable for exercise today.'",{critical:true}),
-          k("Talk to the nurse",W.nurse,"Speak to the nurse in charge."),
-          k("DOCUMENT it",W.doc,"Say: 'I will document it.'")],
+          k("Talk to the nurse",W.nurse,"Speak to the nurse in charge.")],
   unsafe:[k("Doing the exercise when she is sick",["start anyway","go ahead","still do","just do","quick one","try a few","try a little","do a short","do half"],"She has fever and is sleepy. Do not do any exercise today.")],
-  model:"Sister, Mdm A is not suitable for exercise today. I will document it."},
+  model:"Sister, Mdm A is not suitable for exercise today."},
  "r.escalate":{
   checks:[k("Tell the nurse: not suitable for exercise today",W.noStart,"Tell the nurse: 'Mr R is not suitable for exercise today.'",{critical:true}),
           k("Talk to the nurse",W.nurse,"Speak to the nurse in charge."),
-          k("DOCUMENT it",W.doc,"Say: 'I will document it.'"),
           k("The ST must check him first",["speech therap","therapist"," st ","review","assess","see him first","check him first"],"Say: 'I will tell the ST to check him first.'")],
   unsafe:[k("Starting because he looks well",["start anyway","go ahead","still do","just do","looks fine so","seems ok so","seems okay so","quick one","try a few"],"Even if he looks well, wait for the ST after hospital.")],
-  model:"Sister, Mr R is not suitable for exercise today. I will document it and tell the speech therapist to check him first."},
+  model:"Sister, Mr R is not suitable for exercise today. I will tell the speech therapist to check him first."},
  "b.instruct":{
   checks:[k("Explain the exercise",["going to","we will","we'll","today we","exercise","help your swallow","help you swallow","cold spoon"],"Explain in one short line: 'We do the cold spoon exercise.'"),
           k("Say 'Open your mouth'",["open"],"Say: 'Open your mouth.'"),
@@ -375,10 +377,9 @@ const RUB = {
  "b.respond":{
   checks:[k("STOP the exercise",W.stop,"Say clearly: 'We stop now.'",{critical:true}),
           k("Keep him sitting up, ask him to cough",["cough","upright","sit up","clear your throat","sit straight"],"Say: 'Sit up. Cough for me.'"),
-          k("TELL the nurse: not suitable for exercise today",NS.concat(W.nurse),"Tell the nurse: 'Mr B is not suitable for exercise today.'"),
-          k("DOCUMENT it",W.doc,"Say: 'I will document it.'")],
-  unsafe:[k("Continuing the exercise",["continue","carry on","finish the set","one more","few more","next trial","another one","try again","keep going"],"Wet voice = STOP. Do not finish the set."),k("Giving water",["drink","sip","water"],"Do not give water. It can go into the airway.")],
-  model:"Mr B, we stop now. Sit up. Cough for me. Sister, Mr B is not suitable for exercise today. I will document it."},
+          k("TELL the nurse: not suitable for exercise today",NS.concat(W.nurse),"Tell the nurse: 'Mr B is not suitable for exercise today.'")],
+  unsafe:[k("Continuing the exercise",["continue","carry on","finish the set","one more","few more","next trial","another one","try again","go again","do again","keep going"],"Wet voice = STOP. Do not finish the set."),k("Giving water",["drink","sip","water"],"Do not give water. It can go into the airway.")],
+  model:"Mr B, we stop now. Sit up. Cough for me. Sister, Mr B is not suitable for exercise today."},
  "c.respond":{
   checks:[k("Say 'Shoulders down'",["shoulder"],"Say: 'Shoulders down. Relax.'",{critical:true}),
           k("Say 'Keep breathing' or count together",["breath","breathe","count"],"Say: 'Keep breathing. Count with me.'"),
@@ -393,10 +394,9 @@ const RUB = {
           k("Do not pull. Wait.",["wait","don't pull","dont pull","not pull","won't pull","no pulling","leave it"],"Do not pull. Wait for his mouth to relax.",{critical:true}),
           k("Take the spoon out slowly",["gently","slowly","remove","take out","take it out"],"When he lets go, take the spoon out slowly."),
           k("STOP the exercise",W.stop,"Stop the exercise for today."),
-          k("TELL the nurse: not suitable for exercise today",NS.concat(W.nurse),"Tell the nurse: 'Mr D is not suitable for exercise today.'"),
-          k("DOCUMENT it",W.doc,"Say: 'I will document it.'")],
+          k("TELL the nurse: not suitable for exercise today",NS.concat(W.nurse),"Tell the nurse: 'Mr D is not suitable for exercise today.'")],
   unsafe:[k("Pulling or forcing",["pull","yank","force","pry","prise","open his mouth"],"Never pull or force. You can hurt his teeth.")],
-  model:"It's okay, Mr D. Relax. I wait. ... Good. I take the spoon out slowly. We stop now. Sister, Mr D is not suitable for exercise today. I will document it."},
+  model:"It's okay, Mr D. Relax. I wait. ... Good. I take the spoon out slowly. We stop now. Sister, Mr D is not suitable for exercise today."},
  "e.respond":{
   checks:[k("Be kind, say thank you",["thank","good question","i understand","understand","you care","i know you"],"Start kindly: 'Thank you. I know you want her to get better.'"),
           k("Say the ST decides",["speech therap","therapist"," st ","prescri"],"Say: 'The speech therapist decides how many sets.'",{critical:true}),
@@ -408,13 +408,12 @@ const RUB = {
  "f.respond":{
   checks:[k("STOP the exercise",W.stop,"Say clearly: 'We stop now.'",{critical:true}),
           k("Ask about the pain, let him rest",["where","comfortable","rest","sit back","pain","hurt","okay?"],"Ask: 'Where is the pain?' Let him rest."),
-          k("TELL the nurse: not suitable for exercise today",NS.concat(W.nurse),"Tell the nurse: 'Mr F is not suitable for exercise today.'"),
-          k("DOCUMENT it",W.doc,"Say: 'I will document it.'")],
-  unsafe:[k("Continuing",["continue","carry on","one more","few more","push through","keep going","try again","finish"],"Neck pain = STOP, even small pain."),k("Massaging his neck",["massage","rub your neck","rub his neck"],"Do not massage. Let the nurse check.")],
-  model:"Mr F, we stop now. Where is the pain? Sit back and rest. Sister, Mr F is not suitable for exercise today. I will document it."},
+          k("TELL the nurse: not suitable for exercise today",NS.concat(W.nurse),"Tell the nurse: 'Mr F is not suitable for exercise today.'")],
+  unsafe:[k("Continuing",["continue","carry on","one more","few more","push through","keep going","try again","go again","do again","finish"],"Neck pain = STOP, even small pain."),k("Massaging his neck",["massage","rub your neck","rub his neck"],"Do not massage. Let the nurse check.")],
+  model:"Mr F, we stop now. Where is the pain? Sit back and rest. Sister, Mr F is not suitable for exercise today."},
  "g.respond":{
   checks:[k("Praise her",W.praise,"Say: 'Very good!'",{critical:true}),
-          k("Ask if she is okay",["okay?","ok?","comfortable","alright","are you ok","you okay","can or not"],"Ask: 'Are you okay?'"),
+          k("Ask if she is okay",["ok","okay","okay?","ok?","comfortable","alright","are you ok","you okay","can or not"],"Ask: 'Are you okay?'"),
           k("Say what is next",["next","again","another","one more","let's","we do"],"Say: 'Next one.'"),
           k("Dip the spoon again",["dip","ice","cold again","shake"],"Dip the spoon in ice water again. Shake off the water."),
           k("Count: 8 times in total",["2","second","8","eight","more to go","count","7 more","seven more"],"Count: '1 done, 7 more.'")],
@@ -423,21 +422,50 @@ const RUB = {
 };
 for(const c of CASES){ for(const kind of ["escalate","instruct","respond"]) if(c[kind] && RUB[c.id+"."+kind]) c[kind].keys = RUB[c.id+"."+kind].checks.map(x=>x.label); }
 
+/* Forgiving matcher: Singlish, missing words and broken grammar are fine.
+   Text and key phrases are normalised the same way; a phrase matches when all its
+   words appear close together in any order, and long words match their endings
+   (swallow = swallowing, stop = stopped). */
+const NUMS={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10};
+const PARTICLES=/\b(lah|leh|lor|meh|hor|sia|liao|ya|ah|ar|loh|mah)\b/g;
 function norm(t){
-  const nums={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10};
-  return " "+t.toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z0-9'?\s]/g," ").replace(/\b(one|two|three|four|five|six|seven|eight|nine|ten)\b/g,(m)=>m+" "+nums[m]).replace(/\s+/g," ")+" ";
+  return t.toLowerCase().replace(/[’‘`]/g,"'")
+    .replace(/\b(\w+)n't\b/g,"$1nt").replace(/\bcan not\b/g,"cannot").replace(/\bcan't\b/g,"cant").replace(/'/g,"")
+    .replace(/\b(dun|don|donch)\b/g,"dont").replace(/\bwan\b/g,"want").replace(/\bnvm\b/g,"never mind").replace(/\bpls|plz\b/g,"please")
+    .replace(/\?/g," ? ").replace(/[^a-z0-9?\s]/g," ")
+    .replace(/\b(one|two|three|four|five|six|seven|eight|nine|ten)\b/g,m=>m+" "+NUMS[m])
+    .replace(/\s+/g," ").trim();
 }
-function hit(s, any, negAware){
+function toks(t){ return norm(t).split(" ").filter(Boolean); }
+function wordHit(w, q){ if(q.length<=3 || /^\d+$/.test(q)) return w===q || (q.length===3 && w===q+"s"); if(q.endsWith("s")) q=q.slice(0,-1); return w.startsWith(q); }
+const NEG=["not","no","never","dont","wont","cannot","cant","nt","stop","without","dun","neither"];
+function phraseAt(T, P){
+  /* returns index of a match of phrase P (token list) in T, or -1 */
+  const span = P.length + 3;
+  for(let i=0;i<T.length;i++){
+    if(!P.some(q=>wordHit(T[i],q))) continue;
+    const win = T.slice(i, i+span);
+    if(P.every(q=>win.some(w=>wordHit(w,q)))) return i;
+  }
+  return -1;
+}
+function hit(text, any, negAware){
+  const T = Array.isArray(text)? text : toks(text);
   return any.some(p=>{
-    const q=p.toLowerCase(); let i=s.indexOf(q);
-    while(i>-1){ if(!negAware) return true;
-      const before=s.slice(Math.max(0,i-12),i);
-      if(!/(not|n't|no|never|dont|wont|cannot|stop) $/.test(before) && !/(not|n't|never|dont|wont) \w+ $/.test(before)) return true;
-      i=s.indexOf(q,i+1); }
+    const P = toks(p); if(!P.length) return false;
+    let from = 0;
+    while(from < T.length){
+      const i = phraseAt(T.slice(from), P); if(i<0) return false;
+      const at = from+i;
+      if(!negAware) return true;
+      const before = T.slice(Math.max(0,at-3), at);
+      if(!before.some(w=>NEG.includes(w)||w.endsWith("nt"))) return true;
+      from = at+1;
+    }
     return false; });
 }
 function ruleMark(c, kind, t){
-  const rub = RUB[c.id+"."+kind]; const s = norm(t);
+  const rub = RUB[c.id+"."+kind]; const s = toks(t.replace(PARTICLES," "));
   const checks = rub.checks.map(x=>({label:x.label, ok:hit(s,x.any), tip:x.tip, critical:!!x.critical}));
   if(rub.delivery){
     const raw = t.trim();
@@ -445,7 +473,7 @@ function ruleMark(c, kind, t){
     const avg = chunks.reduce((a,x)=>a+x.split(/\s+/).length,0)/Math.max(1,chunks.length);
     checks.push({label:"Ask: 'Okay?' before you start", ok:hit(s,W.perm), tip:"Ask before you start: 'Okay?'", delivery:true});
     checks.push({label:"Short sentences, one step at a time", ok:avg<=12, tip:"Use short sentences. One step, then stop and wait.", delivery:true});
-    const jar = W.jargon.filter(j=>new RegExp("\\b"+j).test(s));
+    const jar = W.jargon.filter(j=>new RegExp("\\b"+j).test(s.join(" ")));
     checks.push({label:"Simple words (no medical words)", ok:!jar.length, tip: jar.length? `Do not say '${jar[0]}' to the resident. Use simple words.`:"", delivery:true});
   }
   const unsafe = (rub.unsafe||[]).filter(x=>hit(s,x.any,true)).map(x=>({label:x.label,tip:x.tip}));
@@ -480,6 +508,7 @@ TA said: """${transcript}"""
 
 Mark it out of 5 (5 = safe, clear and complete; 3 = safe but missing key points; 0-1 = unsafe, e.g. continuing after a stop sign, changing the prescription, wrong dose). Judge both content (safety, accuracy to the prescription, staying in the TA role) and delivery (short sentences, one step at a time, simple words, kind tone, asks permission where relevant. Do NOT mark down for not using the resident's name).
 The TA may be a foreign worker with basic English. Write all feedback in very simple English: short sentences, common words, no idioms. Do not mark down grammar mistakes; judge safety and clarity only.
+Accept Singlish, broken grammar, missing words and wrong verb forms: give full credit when the key point is there in any wording. Do NOT mark down for not saying they will document; documenting is done separately.
 Reply with JSON only: {"score": number 0-5, "headline": "one short sentence verdict", "good": ["up to 3 specific things they did well, quoting their words where useful"], "improve": ["up to 3 specific, practical fixes"], "try_saying": "a model version of what to say, in natural spoken Singapore English, under 60 words"}`;
   const rule = ruleMark(c, kind, transcript);
   if(sample){
@@ -508,14 +537,12 @@ function render(){
 }
 function homeHTML(){
   return `
-  <p class="muted">Practise talking to residents. The page checks your answer and helps you.</p>
-  <ol class="howto" aria-label="How it works"><li><b>1</b>Check</li><li><b>2</b>Speak</li><li><b>3</b>Watch</li><li><b>4</b>Act</li></ol>
+  <p class="muted">Practise talking to residents. Speak, then get feedback.</p>
   <div class="panel">
     <label for="ini">Step 1: Type your initials</label>
     <input type="text" id="ini" value="${esc(state.initials)}" placeholder="e.g. TKL" autocomplete="off" inputmode="text">
     <p class="hint">Example: TKL. Do not type your full name.</p>
   </div>
-  <div class="safety" aria-label="Stop sign response"><div>STOP<small>the exercise</small></div><div>TELL<small>the nurse: "not suitable for exercise today"</small></div><div>DOCUMENT<small>write it down</small></div></div>
   <h2>Step 2: Choose a resident</h2>
   <div class="cases">${CASES.map(c=>`
     <button class="case" data-id="${c.id}" ${state.initials?"":"disabled"}>
@@ -526,7 +553,7 @@ function homeHTML(){
   ${Object.keys(lines).length? `<div class="panel"><h3>My results</h3><p class="resline" id="allres">${CASES.filter(c=>lines[c.id]).map(c=>esc(lines[c.id])).join("<br>")}</p>
     <div><button class="btn ghost" id="copyAll" style="padding:8px 12px;font-size:.9rem">Copy</button> <span class="hint" id="copiedAll"></span></div>
     <p class="hint">Tap Copy. Paste in WhatsApp to your ST.</p></div>`:""}
-  <p class="hint">These residents are not real. Turn on your phone sound.</p>`;
+  <p class="hint">Residents are not real. Turn your sound on.</p>`;
 }
 function progressHTML(){
   if(!db) return `<div class="panel"><h3>How to send your results</h3><ol class="kbd"><li>Finish a resident.</li><li>Tap <b>Copy</b>.</li><li>Open WhatsApp. Paste and send to your ST.</li></ol></div>`;
@@ -569,8 +596,8 @@ function fbHTML(m){
     ${(m.warns||[]).map(u=>`<p class="warnbox"><b>Check: ${esc(u.label)}.</b> ${esc(u.tip)}</p>`).join("")}
     ${fixes.length?`<div><span class="eyebrow" style="color:var(--stop)">${m.ai?"To improve":"Fix this"}</span><ul>${fixes.map(g=>`<li>${esc(g)}</li>`).join("")}</ul></div>`:""}
     ${m.ai&&m.good?.length?`<div><span class="eyebrow" style="color:var(--go)">What worked</span><ul>${m.good.map(g=>`<li>${esc(g)}</li>`).join("")}</ul></div>`:""}
-    ${content.length?`<details ${m.ai?"":"open"}><summary>What you said</summary>${list(content)}</details>`:""}
-    ${delivery.length?`<details ${m.ai?"":"open"}><summary>How you said it</summary>${list(delivery)}</details>`:""}
+    ${content.length?`<details><summary>What you said (${content.filter(x=>x.ok).length} of ${content.length})</summary>${list(content)}</details>`:""}
+    ${delivery.length?`<details><summary>How you said it (${delivery.filter(x=>x.ok).length} of ${delivery.length})</summary>${list(delivery)}</details>`:""}
     ${m.try_saying?`<div><span class="eyebrow">Better way to say it</span><p class="try">"${esc(m.try_saying)}"</p><button class="btn ghost" data-hear="${esc(m.try_saying)}" style="margin-top:6px;padding:8px 12px;font-size:.9rem">🔊 Listen</button></div>`:""}
   </div>`;
 }
@@ -626,24 +653,26 @@ function renderCase(){
     <p class="handover">${esc(c.handover)}</p>
   </div>`;
 
+  const past = (done, label, inner) => done ? `<details class="past"><summary>${label}</summary>${inner}</details>` : inner;
+  const ok = v => v ? "✓ Correct" : "✗ Not correct";
   // Stage 0: pre-check
-  html += `<div class="panel"><h3>Read the plan and the nurse's message. Is it safe to start?</h3>
+  html += past(r.stage>0, `Step 1: Check · ${ok(r.preChoice===c.pre.answer)}`, `<div class="panel"><h3>Read the plan and the nurse's message. Is it safe to start?</h3>
     <div class="row"><button class="btn ${r.preChoice==="yes"?"":"ghost"}" data-pre="yes" ${r.preChoice?"disabled":""}>Yes, start</button><button class="btn stop ${r.preChoice==="no"?"":"ghost"}" data-pre="no" ${r.preChoice?"disabled":""}>No, do not start</button></div>
     ${r.preChoice? decisionHTML(r.preChoice===c.pre.answer, c.pre.why) : ""}
     ${r.preChoice && r.stage===0? `<button class="btn" id="next0">Next</button>`:""}
-  </div>`;
+  </div>`);
 
   if(noStart && r.stage>=1) html += speakBox("esc", c.escalate.prompt);
-  if(!noStart && r.stage>=1) html += speakBox("ins", c.instruct.prompt);
+  if(!noStart && r.stage>=1) html += past(r.stage>1, `Step 2: Speak · ${r.marks.instruct?.score??"-"}/5`, speakBox("ins", c.instruct.prompt));
   if(!noStart && r.stage===1 && r.marks.instruct) html += `<button class="btn" id="next1">Next: watch ${esc(c.name)}</button>`;
   if(!noStart && r.stage>=2){
-    html += `<div class="panel"><h3>Look at the resident. What do you do?</h3>
+    html += past(r.stage>2, `Step 3: Watch · ${ok(r.reactChoice===c.react.answer)}`, `<div class="panel"><h3>Look at the resident. What do you do?</h3>
       <div class="row">
         ${[["continue","Continue"],["correct","Fix the movement, then continue"],["stop","STOP"]].map(([v,l])=>`<button class="btn ${v==="stop"?"stop":""} ${r.reactChoice===v?"":"ghost"}" data-react="${v}" ${r.reactChoice?"disabled":""}>${l}</button>`).join("")}
       </div>
       ${r.reactChoice? decisionHTML(r.reactChoice===c.react.answer, c.react.why):""}
       ${r.reactChoice && r.stage===2? `<button class="btn" id="next2">Next</button>`:""}
-    </div>`;
+    </div>`);
   }
   if(!noStart && r.stage>=3) html += speakBox("res", c.respond.prompt);
   const finished = noStart? !!r.marks.escalate : !!r.marks.respond;
