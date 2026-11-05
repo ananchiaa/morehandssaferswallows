@@ -1,0 +1,720 @@
+<!DOCTYPE html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Safer Swallows Practice</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap">
+<style>
+/* Layout: one narrow bedside column; resident card on top, the TA's turn below, feedback slips in under each turn */
+:root{
+  --bg:#F4F8F7; --surface:#FFFFFF; --ink:#1F2A2E; --muted:#5B6B70; --line:#D5E4E1;
+  --deep:#0B4F5C; --teal:#1A8C8C; --mint:#CFE8E4; --wash:#EEF6F5;
+  --stop:#B8432A; --stop-wash:#FBE3DA; --amber:#C98A10; --amber-wash:#FCF1D6; --go:#2E7D4F; --go-wash:#E1F2E7;
+  --skin:#E2B48C; --hair:#C9CED0; --shirt:#7FB7B0;
+  --display:"Fraunces",Georgia,serif; --body:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1A1C; --surface:#152427; --ink:#E6EFEE; --muted:#9FB3B5; --line:#26393C;
+  --deep:#7CCFD0; --teal:#4FB6B3; --mint:#1D3B3C; --wash:#13282A;
+  --stop:#F08A6E; --stop-wash:#3A211A; --amber:#E9B44C; --amber-wash:#352A12; --go:#6CC48F; --go-wash:#16301F;
+  --skin:#C9976E; --hair:#8E9699; --shirt:#3F7C76; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1A1C; --surface:#152427; --ink:#E6EFEE; --muted:#9FB3B5; --line:#26393C;
+  --deep:#7CCFD0; --teal:#4FB6B3; --mint:#1D3B3C; --wash:#13282A;
+  --stop:#F08A6E; --stop-wash:#3A211A; --amber:#E9B44C; --amber-wash:#352A12; --go:#6CC48F; --go-wash:#16301F;
+  --skin:#C9976E; --hair:#8E9699; --shirt:#3F7C76; color-scheme:dark}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--body);font-size:16px;line-height:1.5}
+.wrap{max-width:640px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15;color:var(--deep)}
+h1{font-size:1.9rem}
+h2{font-size:1.35rem}
+h3{font-size:1.05rem;font-family:var(--body);font-weight:800;color:var(--ink)}
+p{margin:0}
+.muted{color:var(--muted)}
+.eyebrow{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--teal)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.tabs{display:flex;gap:6px;background:var(--wash);padding:4px;border-radius:999px}
+.tabs button{border:0;background:transparent;color:var(--muted);font:700 .9rem var(--body);padding:8px 14px;border-radius:999px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--surface);color:var(--deep);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+label{font-weight:700;font-size:.9rem}
+input[type=text],textarea{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;box-sizing:border-box}
+textarea{min-height:96px;resize:vertical}
+input:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.btn{font:800 1rem var(--body);border-radius:12px;padding:12px 16px;border:1.5px solid var(--deep);background:var(--deep);color:var(--surface);cursor:pointer;text-align:center}
+.btn.ghost{background:transparent;color:var(--deep)}
+.btn.stop{background:var(--stop);border-color:var(--stop)}
+.btn.stop.ghost{background:transparent;color:var(--stop)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>.btn{flex:1 1 140px}
+.cases{display:grid;gap:10px}
+.case{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%}
+.case:hover{border-color:var(--teal)}
+.case .av{width:48px;height:48px}
+.case .meta{min-width:0}
+.case .meta b{display:block}
+.case .meta span{font-size:.85rem;color:var(--muted)}
+.pill{font-size:.75rem;font-weight:800;padding:3px 9px;border-radius:999px;background:var(--wash);color:var(--deep);white-space:nowrap}
+.pill.done{background:var(--go-wash);color:var(--go)}
+.chip{display:inline-block;font-size:.75rem;font-weight:800;padding:2px 8px;border-radius:6px;background:var(--mint);color:var(--deep)}
+/* resident */
+.bed{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:center}
+@media (max-width:420px){.bed{grid-template-columns:96px 1fr}}
+.bed svg{width:100%;height:auto;max-width:100%}
+.say{background:var(--wash);border-radius:12px;padding:10px 12px;font-weight:600;position:relative}
+.say.alert{background:var(--stop-wash)}
+.obs{font-size:.9rem;color:var(--muted)}
+.rx{border-left:4px solid var(--teal);background:var(--wash);border-radius:0 10px 10px 0;padding:10px 12px;font-size:.92rem}
+.rx dt{font-weight:800}
+.rx dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:2px 10px}
+.rx dd{margin:0}
+.handover{font-size:.95rem}
+.steps{display:flex;gap:6px}
+.steps{list-style:none;margin:0;padding:0;display:flex;gap:6px}
+.steps li{flex:1;text-align:center;font-size:.8rem;font-weight:800;color:var(--muted);border-top:5px solid var(--line);padding-top:4px}
+.steps li.on{color:var(--deep);border-color:var(--teal)}
+.steps li.now{color:var(--ink)}
+.howto{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}
+.howto li{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 4px;font-size:.8rem;font-weight:700}
+.howto b{display:block;font-family:var(--display);font-size:1.3rem;color:var(--teal)}
+.kbd{display:grid;gap:6px;margin:0;padding-left:22px;font-weight:600}
+/* speaking */
+.mic{display:flex;flex-direction:column;align-items:center;gap:8px;padding-block:6px}
+.micbtn{width:88px;height:88px;border-radius:50%;border:0;background:var(--teal);color:#fff;cursor:pointer;flex:none;display:grid;place-items:center}
+.micbtn svg{width:38px;height:38px}
+.micbtn:disabled{opacity:.4;animation:none}
+.miclabel{font-weight:800;font-size:1.05rem;margin:0}
+.micbtn.live{background:var(--stop);animation:pulse 1.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--stop) 50%,transparent)}100%{box-shadow:0 0 0 16px transparent}}
+@media (prefers-reduced-motion:reduce){.micbtn.live{animation:none}}
+.hint{font-size:.85rem;color:var(--muted)}
+.note{font-size:.85rem;background:var(--amber-wash);color:var(--ink);border-radius:10px;padding:8px 10px}
+/* feedback */
+.fb{border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;border:1.5px solid var(--line)}
+.fb.good{background:var(--go-wash);border-color:color-mix(in srgb,var(--go) 35%,transparent)}
+.fb.mid{background:var(--amber-wash);border-color:color-mix(in srgb,var(--amber) 35%,transparent)}
+.fb.bad{background:var(--stop-wash);border-color:color-mix(in srgb,var(--stop) 35%,transparent)}
+.fb ul{margin:0;padding-left:20px}
+.fb .head{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.fb .head b{font-size:1.05rem}
+.checks{list-style:none;padding:0;margin:6px 0 0;display:grid;gap:4px}
+.checks li{display:grid;grid-template-columns:20px 1fr;gap:6px;font-size:.93rem}
+.checks li.ok>span:first-child{color:var(--go);font-weight:800}
+.checks li.no>span:first-child{color:var(--stop);font-weight:800}
+.checks li.no{color:var(--muted)}
+.key{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;background:var(--surface);color:var(--stop);padding:1px 6px;border-radius:5px}
+details summary{font-weight:800;cursor:pointer;font-size:.9rem}
+.alertbox{background:var(--surface);border-left:4px solid var(--stop);padding:8px 10px;border-radius:0 8px 8px 0}
+.warnbox{background:var(--surface);border-left:4px solid var(--amber);padding:8px 10px;border-radius:0 8px 8px 0}
+.resline{font-family:ui-monospace,Menlo,monospace;font-size:.85rem;background:var(--wash);border-radius:8px;padding:8px 10px;overflow-wrap:anywhere}
+.score{font-variant-numeric:tabular-nums;font-weight:800}
+.try{background:var(--surface);border-radius:10px;padding:8px 10px;font-style:italic}
+.big{font-family:var(--display);font-size:3rem;color:var(--deep);line-height:1}
+table{border-collapse:collapse;width:100%;font-size:.9rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+th{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.tablewrap{overflow-x:auto}
+.thinking{display:flex;gap:8px;align-items:center;color:var(--muted);font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--teal);animation:blink 1s infinite alternate}
+@keyframes blink{from{opacity:.25}to{opacity:1}}
+.back{background:none;border:0;color:var(--teal);font:800 .95rem var(--body);cursor:pointer;padding:0;align-self:flex-start}
+.safety{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.safety div{border-radius:10px;padding:8px 4px;background:var(--stop-wash);font-weight:800;color:var(--stop);font-size:.9rem}
+.safety small{display:block;font-weight:600;color:var(--ink)}
+</style>
+
+<div class="wrap" id="app"></div>
+
+<script>
+const CASES = [
+  { id:"a", name:"Mdm A", age:84, ex:"TTS", look:{hair:"bun",glasses:false},
+    rx:{Exercise:"TTS (cold spoon on the throat arch)",How:"Rub left side, then right side, 5 times. Then say 'Swallow'.",Amount:"10 times, 1 time a day",Tool:"Metal spoon in ice water"},
+    handover:"Nurse says: \"Mdm A has fever this morning (38.2°C). She is more sleepy than usual.\"",
+    pre:{answer:"no",why:"Fever and sleepy are 'do not start' signs. A sleepy person cannot swallow safely."},
+    escalate:{prompt:"You do not start. What do you say to the nurse?"},
+    learn:"Fever or sleepy = do not start. Tell the nurse: 'not suitable for exercise today'. DOCUMENT." },
+  { id:"r", name:"Mr R", age:79, ex:"CTAR", look:{hair:"short",glasses:true},
+    rx:{Exercise:"CTAR (chin tuck with a ball)",How:"Ball under chin. Squeeze and hold 10 seconds.",Amount:"3 sets of 5",Position:"Sit up straight, back supported"},
+    handover:"Nurse says: \"Mr R came back from hospital yesterday. He had a chest infection. He looks happy today.\"",
+    pre:{answer:"no",why:"He just came back from hospital. The ST must check him first. His exercises may change."},
+    escalate:{prompt:"You do not start. What do you say to the nurse?"},
+    learn:"Back from hospital = wait for the ST to check first, even if he looks well." },
+  { id:"b", name:"Mr B", age:81, ex:"TTS", look:{hair:"bald",glasses:false},
+    rx:{Exercise:"TTS (cold spoon on the throat arch)",How:"Rub left side, then right side, 5 times. Then say 'Swallow'.",Amount:"10 times",Tool:"Metal spoon in ice water"},
+    handover:"Nurse says: \"Mr B is well today. No fever. He is awake. He ate breakfast 1 hour ago. His mouth is clean.\"",
+    pre:{answer:"yes",why:"He is well and awake, and his mouth is clean. It is safe to start."},
+    instruct:{prompt:"Mr B is sitting up. Say hello, explain the exercise, and give the first instruction."},
+    react:{state:"wet",say:"Okay... (his voice sounds wet, like gargling)",obs:"After the 3rd swallow, his voice sounds wet and gurgly. He clears his throat 2 times.",answer:"stop",why:"A wet, gurgly voice is a STOP sign. Food or saliva may be near his airway."},
+    respond:{prompt:"What do you do now? What do you say to the nurse?"},
+    learn:"Wet voice = STOP, TELL the nurse, DOCUMENT. Do not finish the set." },
+  { id:"c", name:"Mdm C", age:76, ex:"CTAR", look:{hair:"long",glasses:true},
+    rx:{Exercise:"CTAR (chin tuck with a ball)",How:"Ball under chin. Squeeze and hold 10 seconds.",Amount:"3 sets of 5",Position:"Sit up straight, back supported"},
+    handover:"Nurse says: \"Mdm C is well and awake today. Her vital signs are normal.\"",
+    pre:{answer:"yes",why:"No warning signs today. She is well and awake."},
+    instruct:{prompt:"Mdm C is sitting up with the ball. Give the instruction for the first hold."},
+    react:{state:"hunch",say:"Mmmph... (her cheeks puff out)",obs:"She lifts her shoulders up high and holds her breath when she squeezes.",answer:"correct",why:"This is a wrong movement, not a stop sign. Fix her position, tell her to breathe, then continue."},
+    respond:{prompt:"What do you say to Mdm C to fix the movement?"},
+    learn:"Shoulders up or holding breath = wrong movement. Show her and fix it, then continue." },
+  { id:"d", name:"Mr D", age:88, ex:"OME", look:{hair:"short",glasses:false},
+    rx:{Exercise:"OME (tongue push)",How:"Push the spoon with the tongue. Hold 3 seconds.",Amount:"10 times",Tool:"Spoon or tongue depressor"},
+    handover:"Nurse says: \"Mr D is well today. He moves around a bit, but he is awake.\"",
+    pre:{answer:"yes",why:"Moving around a bit is not a stop sign. He is well and awake. Start, and watch him closely."},
+    instruct:{prompt:"Explain the tongue push exercise to Mr D and give the first instruction."},
+    react:{state:"bite",say:"Nngh! (he bites the spoon hard)",obs:"He bites the spoon very hard and does not let go.",answer:"stop",why:"A strong bite is a STOP sign. Never pull the spoon. Wait for his mouth to relax."},
+    respond:{prompt:"What do you do now? Who do you tell?"},
+    learn:"Strong bite: do not pull. Wait, take the spoon out slowly. STOP, TELL the nurse, DOCUMENT." },
+  { id:"e", name:"Mdm E", age:73, ex:"OME", look:{hair:"bun",glasses:true}, family:true,
+    rx:{Exercise:"OME (lip exercise)",How:"Say 'OO' then 'EE', 10 times. Puff cheeks and hold 3 seconds, 5 times.",Amount:"2 sets",Tool:"Mirror"},
+    handover:"Nurse says: \"Mdm E is well today. Her daughter is visiting and wants to watch.\"",
+    pre:{answer:"yes",why:"She is well. Family can watch. You can show them the right way."},
+    instruct:{prompt:"Give Mdm E the instruction for the lip exercise. Use the mirror."},
+    react:{state:"happy",say:"Daughter: \"Only 2 sets? Can do 5 sets? More practice, faster recover, right?\"",obs:"Mdm E is doing well. Her daughter asks you to do more sets.",answer:"continue",why:"Only the ST can change the exercise. Continue the same amount. Tell the daughter to ask the ST."},
+    respond:{prompt:"What do you say to the daughter?"},
+    learn:"Family asks for more? Only the ST can change it. The TA never changes the exercise." },
+  { id:"f", name:"Mr F", age:77, ex:"CTAR", look:{hair:"short",glasses:true},
+    rx:{Exercise:"CTAR (chin tuck with fist)",How:"Fist under chin. Squeeze, then relax at once. No hold.",Amount:"3 sets of 10",Position:"Sit up straight, back supported"},
+    handover:"Nurse says: \"Mr F is well. No problems this morning.\"",
+    pre:{answer:"yes",why:"No warning signs today."},
+    instruct:{prompt:"Give Mr F the instruction for the chin tuck."},
+    react:{state:"pain",say:"Aiyo, my neck pain leh... (he rubs his neck)",obs:"On the 4th time, his face shows pain. He says his neck hurts.",answer:"stop",why:"Neck pain is a STOP sign. Do not continue, even if it is 'only a little' pain."},
+    respond:{prompt:"What do you do now? Who do you tell?"},
+    learn:"Pain in neck, jaw or chest = STOP, TELL, DOCUMENT, even small pain." },
+  { id:"g", name:"Mdm G", age:80, ex:"CSP", look:{hair:"long",glasses:false},
+    rx:{Exercise:"CSP (cold spoon on the tongue)",How:"Press the middle of the tongue 5 times. Then say 'Swallow'.",Amount:"8 times",Tool:"Metal spoon in ice water"},
+    handover:"Nurse says: \"Mdm G is well and awake today. Mouth care is done.\"",
+    pre:{answer:"yes",why:"She is well and awake, and her mouth is clean."},
+    instruct:{prompt:"Say hello to Mdm G, explain, and give the first instruction."},
+    react:{state:"happy",say:"Wah, the spoon so cold! (she smiles, swallows well, clear voice)",obs:"She swallows well. Her voice is clear. Her breathing and colour are normal.",answer:"continue",why:"No stop signs. Saying 'cold' is normal. Praise her and continue."},
+    respond:{prompt:"What do you say to Mdm G before the next one?"},
+    learn:"Not every reaction is a stop sign. If all is normal, praise and continue." }
+];
+
+const ROLE_RULES = `TA role in this nursing home dysphagia programme (task-sharing, supervised by a speech therapist, ST):
+- TA runs only the exercises the ST prescribed, at the prescribed dose. TA never changes the prescription, diet or IDDSI levels; asks the ST when in doubt.
+- Pre-session checks: right resident with a written prescription; well today (no fever, new chest infection, drowsiness, or recent hospital discharge not yet reviewed by ST); consent; sitting upright with mouth clear.
+- Do not start if: drowsy or unwell; recently discharged and not yet reviewed by ST; distressed or refusing; strong bite or gag reflex; neck pain.
+- Stop signs during the session: coughing or choking; wet, gurgly or hoarse voice; change in breathing or colour; pain in the neck, jaw or chest; dizziness; drowsiness; distress or refusal; strong bite.
+- Response to a stop sign or a do-not-start sign: STOP, TELL the nurse in charge that the resident is "not suitable for exercise today" (no need to name the exercise or explain details), DOCUMENT.
+- TTS: metal teaspoon dipped in ice water, open mouth, stroke front throat arch left then right 5 times, take the spoon out, say "Swallow". Don't go too far back (gag) or let the spoon drip. CSP: press the middle of the tongue 5 times instead.
+- CTAR: upright, back supported, ball (10 cm) or fist between chin and top of chest, tuck chin to squeeze, hold for the prescribed seconds (sustained) or relax at once (repeated). No hunching shoulders, no breath-holding.
+- OME: lips ("OO"/"EE", puff cheeks and hold), tongue range and strength (push against a spoon); mirror for feedback; no extra movements; never force a depressor.
+Good resident instructions: greet, explain briefly, ask permission, one short step at a time, demonstrate, simple everyday words (Singapore older adults; some Singlish is fine), kind tone, give the prescribed numbers correctly, check comfort.`;
+
+const STAGES = ["Check","Speak","Watch","Act"];
+let state = { view:"home", initials:"", caseId:null, run:null };
+try{ state.initials = localStorage.getItem("ssp-initials")||""; }catch(e){}
+let done = {}; try{ done = JSON.parse(localStorage.getItem("ssp-done")||"{}"); }catch(e){}
+let lines = {}; try{ lines = JSON.parse(localStorage.getItem("ssp-lines")||"{}"); }catch(e){}
+let sample = null, db = null, attempts = [];
+const app = document.getElementById("app");
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- resident drawing ---------- */
+function resident(c, st="neutral"){
+  const hunch = st==="hunch", drowsy = st==="drowsy", happy = st==="happy";
+    const eyes = drowsy ? `<path d="M48 70q6 3 12 0M80 70q6 3 12 0" stroke="var(--ink)" stroke-width="3" fill="none" stroke-linecap="round"/>`
+    : st==="pain" ? `<path d="M47 66l12 5M93 66l-12 5" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>`
+    : `<circle cx="54" cy="69" r="4" fill="var(--ink)"/><circle cx="86" cy="69" r="4" fill="var(--ink)"/>`;
+  const mouth = happy ? `<path d="M56 92q14 12 28 0" stroke="var(--ink)" stroke-width="3" fill="none" stroke-linecap="round"/>`
+    : st==="wet" ? `<ellipse cx="70" cy="94" rx="8" ry="6" fill="var(--ink)"/><path d="M62 101q2 6 4 0" stroke="var(--teal)" stroke-width="3" fill="none"/>`
+    : st==="bite" ? `<rect x="54" y="88" width="32" height="10" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/><path d="M62 88v10M70 88v10M78 88v10" stroke="var(--ink)" stroke-width="1.5"/><rect x="84" y="90" width="34" height="6" rx="3" fill="#B9C3C6"/>`
+    : st==="pain" ? `<path d="M56 96q14 -8 28 0" stroke="var(--ink)" stroke-width="3" fill="none" stroke-linecap="round"/>`
+    : st==="hunch" ? `<circle cx="70" cy="94" r="3" fill="var(--ink)"/>`
+    : `<path d="M58 94h24" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>`;
+  const cheeks = hunch ? `<circle cx="46" cy="88" r="9" fill="var(--skin)" stroke="var(--ink)" stroke-opacity=".25"/><circle cx="94" cy="88" r="9" fill="var(--skin)" stroke="var(--ink)" stroke-opacity=".25"/>` : "";
+  const hair = {
+    bun:`<circle cx="70" cy="22" r="14" fill="var(--hair)"/><path d="M28 70q0-46 42-46t42 46q-6-30-42-30t-42 30z" fill="var(--hair)"/>`,
+    long:`<path d="M24 100q-6-76 46-76t46 76q-8-50-46-56t-46 56z" fill="var(--hair)"/>`,
+    short:`<path d="M30 64q2-40 40-40t40 40q-10-22-40-22t-40 22z" fill="var(--hair)"/>`,
+    bald:`<path d="M30 70q-2-14 4-18M110 70q2-14-4-18" stroke="var(--hair)" stroke-width="8" stroke-linecap="round" fill="none"/>`
+  }[c.look.hair];
+  const glasses = c.look.glasses ? `<g fill="none" stroke="var(--ink)" stroke-width="2"><circle cx="54" cy="69" r="10"/><circle cx="86" cy="69" r="10"/><path d="M64 69h12"/></g>` : "";
+  const fx = st==="wet" ? `<path d="M112 84q8 4 0 8q8 4 0 8" stroke="var(--teal)" stroke-width="2.5" fill="none"/><text x="114" y="76" font-size="13" font-weight="800" fill="var(--teal)">~</text>`
+    : drowsy ? `<text x="104" y="40" font-size="16" font-weight="800" fill="var(--muted)">z</text><text x="116" y="28" font-size="12" font-weight="800" fill="var(--muted)">z</text>`
+    : st==="pain" ? `<path d="M118 112l8-6M120 122l10-2M118 132l8 4" stroke="var(--stop)" stroke-width="3" stroke-linecap="round"/>`
+    : hunch ? `<path d="M16 108l-6-10M124 108l6-10" stroke="var(--amber)" stroke-width="3" stroke-linecap="round"/>` : "";
+  return `<svg viewBox="0 0 140 170" role="img" aria-label="${esc(c.name)}, ${st}">
+    <path d="M10 170q2-46 60-48q58 2 60 48z" fill="var(--shirt)" transform="translate(0 ${hunch?-10:0})"/>
+    <rect x="58" y="${hunch?100:108}" width="24" height="${hunch?14:16}" fill="var(--skin)"/>
+    ${hair}
+    <ellipse cx="70" cy="74" rx="38" ry="42" fill="var(--skin)"/>
+    ${cheeks}${eyes}${glasses}${mouth}${fx}
+    ${c.family? `<g opacity=".9"><circle cx="128" cy="40" r="9" fill="var(--skin)"/><path d="M114 70q2-18 14-18t14 18z" fill="var(--teal)"/></g>`:""}
+  </svg>`;
+}
+
+/* ---------- speech ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, micBlocked = false;
+function speak(text){
+  try{
+    if(!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text.replace(/\(.*?\)/g,""));
+    const v = speechSynthesis.getVoices().find(v=>/en[-_](SG|GB|AU)/i.test(v.lang)); if(v) u.voice=v;
+    u.rate = .9; speechSynthesis.speak(u);
+  }catch(e){}
+}
+/* One big button: tap to speak, tap again to finish and get feedback.
+   Uses the browser's speech recognition where the page is allowed the mic;
+   otherwise opens the keyboard so the TA can use its own mic. */
+function micTap(ctl){
+  const {btn, ta, label, note, submit} = ctl;
+  if(ctl.mode==="idle"){
+    if(SR && !micBlocked){
+      rec = new SR(); rec.lang="en-SG"; rec.interimResults=true; rec.continuous=true;
+      const base = ta.value ? ta.value.trim()+" " : "";
+      rec.onresult = e => { let t=""; for(const r of e.results) t+=r[0].transcript; ta.value = base+t; };
+      rec.onerror = e => { if(["not-allowed","service-not-allowed","audio-capture"].includes(e.error)){ micBlocked=true; keyboardMode(ctl); } };
+      rec.onend = () => { rec=null; if(ctl.mode==="rec" && ctl.finishing) finish(ctl); };
+      try{ rec.start(); ctl.mode="rec"; btn.classList.add("live"); label.textContent="Listening… Tap to finish"; btn.setAttribute("aria-label","Finish speaking"); return; }
+      catch(e){ micBlocked=true; rec=null; }
+    }
+    keyboardMode(ctl); return;
+  }
+  if(ctl.mode==="rec" && rec){ ctl.finishing=true; rec.stop(); return; }
+  finish(ctl);
+}
+function keyboardMode(ctl){
+  ctl.mode="kbd"; ctl.btn.classList.add("live");
+  ctl.label.textContent="Tap to finish"; ctl.btn.setAttribute("aria-label","Finish speaking");
+  ctl.note.hidden=false; ctl.ta.hidden=false; ctl.ta.focus();
+}
+function finish(ctl){
+  ctl.btn.classList.remove("live");
+  if(ctl.ta.value.trim().split(/\s+/).filter(Boolean).length<3){
+    ctl.mode="idle"; ctl.label.textContent="I did not hear you. Tap to speak again."; return;
+  }
+  ctl.mode="done"; ctl.submit();
+}
+
+/* ---------- offline marking guide ---------- */
+const NS = ["not suitable","not fit","not well enough","no exercise today","cannot do exercise","can't do exercise"];
+const W = {
+  stop:["not suitable","not fit","stop","pause","no more","end the session","end here","finish here","enough for today","not continue"],
+  noStart:["not suitable","not fit","not well enough","not start","don't start","dont start","won't start","wont start","not going to start","not doing","not do the","not do her","not do his","hold off","withhold","skip","postpone","cancel","no session","no exercise","not today"],
+  nurse:["nurse","sister","staff nurse","nic","in charge"],
+  doc:["document","record","write","chart","note it","notes","notes","report form","log it"],
+  st:["speech therap","therapist"," st ","st's","the st","st to","review"],
+  praise:["good","well done","very good","great","excellent","that's it","thats it","nice","bagus","steady"],
+  perm:["can i","may i","is it ok","is it okay","is that ok","is that okay","okay?","ok?","can or not","alright?","shall we","are you ready","ready?","can we","you ok with","do you mind","agree"],
+  demo:["like me","watch me","like this","follow me","see me","copy me","look at me","i show you","let me show"],
+  jargon:["tts","thermal","tactile","palatoglossal","faucial","anterior","aspirat","bolus","pharyn","laryn","oral motor","ome","ctar","csp","resistance","dysphag","sustained","repetitions","reps"],
+  calm:["calm","relax","it's okay","its okay","don't worry","dont worry","never mind","it's alright","take your time","slowly"]
+};
+const k = (label, any, tip, opt={}) => ({label, any, tip, ...opt});
+const RUB = {
+ "a.escalate":{
+  checks:[k("Tell the nurse: not suitable for exercise today",W.noStart,"Tell the nurse: 'Mdm A is not suitable for exercise today.'",{critical:true}),
+          k("Talk to the nurse",W.nurse,"Speak to the nurse in charge."),
+          k("DOCUMENT it",W.doc,"Say: 'I will document it.'")],
+  unsafe:[k("Doing the exercise when she is sick",["start anyway","go ahead","still do","just do","quick one","try a few","try a little","do a short","do half"],"She has fever and is sleepy. Do not do any exercise today.")],
+  model:"Sister, Mdm A is not suitable for exercise today. I will document it."},
+ "r.escalate":{
+  checks:[k("Tell the nurse: not suitable for exercise today",W.noStart,"Tell the nurse: 'Mr R is not suitable for exercise today.'",{critical:true}),
+          k("Talk to the nurse",W.nurse,"Speak to the nurse in charge."),
+          k("DOCUMENT it",W.doc,"Say: 'I will document it.'"),
+          k("The ST must check him first",["speech therap","therapist"," st ","review","assess","see him first","check him first"],"Say: 'I will tell the ST to check him first.'")],
+  unsafe:[k("Starting because he looks well",["start anyway","go ahead","still do","just do","looks fine so","seems ok so","seems okay so","quick one","try a few"],"Even if he looks well, wait for the ST after hospital.")],
+  model:"Sister, Mr R is not suitable for exercise today. I will document it and tell the speech therapist to check him first."},
+ "b.instruct":{
+  checks:[k("Explain the exercise",["going to","we will","we'll","today we","exercise","help your swallow","help you swallow","cold spoon"],"Explain in one short line: 'We do the cold spoon exercise.'"),
+          k("Say 'Open your mouth'",["open"],"Say: 'Open your mouth.'"),
+          k("Say the spoon is cold",["cold","spoon","ice"],"Say: 'The spoon is cold.'"),
+          k("Say the number: 5 times",[" 5 ","5 times","five"],"Say the number: '5 times.'"),
+          k("Spoon out first, then 'Swallow'",["take out","remove","spoon out","close your mouth","then swallow","now swallow","after that swallow"],"Take the spoon out first. Then say: 'Now swallow.'",{critical:true})],
+  warn:[k("Going too far back",["far back","deep","back of your throat"],"Do not go too far back. He may gag.")],
+  unsafe:[k("Giving water or food",["drink","sip","water to swallow","some water"],"Use only the cold spoon. Do not give water.")],
+  delivery:true, model:"Good morning, Mr B. We do the cold spoon exercise. Okay? Open your mouth. I touch 5 times. It is cold. Close your mouth. Now swallow."},
+ "c.instruct":{
+  checks:[k("Say 'ball'",["ball"],"Say: 'Hold the ball.'"),
+          k("Ball under the chin",["chin","chest","under","neck"],"Say: 'Put the ball under your chin.'"),
+          k("Say 'Tuck your chin and squeeze'",["tuck","squeeze","press","push down","look down","bend","chin down"],"Say: 'Chin down. Squeeze the ball.'",{critical:true}),
+          k("Say the number: 10 seconds",["10","ten"],"Say: 'Hold for 10 seconds.'"),
+          k("Say 'Relax'",["relax","rest","let go","release"],"At the end say: 'Now relax.'"),
+          k("Say 'Keep breathing' or count together",["breath","breathe","count"],"Say: 'Keep breathing. Count with me.'")],
+  unsafe:[k("Telling her to hold her breath",["hold your breath","hold the breath","don't breathe","dont breathe"],"Never say 'hold your breath'. Say 'keep breathing'.")],
+  delivery:true, model:"Mdm C, chin exercise now, okay? Put the ball under your chin. Chin down. Squeeze. Hold. Count with me to 10. Keep breathing. Good. Now relax."},
+ "d.instruct":{
+  checks:[k("Explain the exercise",["going to","we will","we'll","exercise","tongue exercise","make your tongue strong"],"Say: 'This makes your tongue strong.'"),
+          k("Say 'spoon'",["spoon"],"Show him the spoon."),
+          k("Say 'Push'",["push"],"Say: 'Push the spoon with your tongue.'",{critical:true}),
+          k("Say 'tongue'",["tongue"],"Say 'tongue' so he knows what to move."),
+          k("Say the number: 3 seconds",[" 3 ","3 seconds","three"],"Say: 'Hold, 1, 2, 3.'"),
+          k("Say 'Relax'",["relax","rest","let go","release","stop pushing"],"At the end say: 'Now relax.'")],
+  unsafe:[k("Telling him to bite",["bite"],"Never say 'bite'. He pushes with the tongue only."),k("Forcing the spoon",["force","press hard on your tongue","push it in"],"Never force the spoon.")],
+  delivery:true, model:"Mr D, this exercise makes your tongue strong. Can I start? Open your mouth a little. Push the spoon with your tongue. Hold, 1, 2, 3. Good. Now relax."},
+ "e.instruct":{
+  checks:[k("Use the mirror",["mirror"],"Say: 'Look in the mirror.'"),
+          k("Say 'OO'",["oo","ooh","kiss","lips forward","pout","u u"],"Say: 'Round lips. OO.'",{critical:true}),
+          k("Say 'EE'",["ee","smile","eee"],"Say: 'Big smile. EE.'"),
+          k("Say the number: 10 times",["10","ten"],"Say: '10 times.'"),
+          k("Show her how",W.demo,"Show her first: 'Watch me. Like this.'")],
+  unsafe:[k("Adding other movements",["tongue out","stick out your tongue","blow","whistle","chew"],"Do only the lip movements on the plan.")],
+  delivery:true, model:"Mdm E, lip exercise now. Okay? Look in the mirror. Watch me. OO. Now big smile, EE. OO, EE. We do 10 times."},
+ "f.instruct":{
+  checks:[k("Say 'fist'",["fist","hand"],"Say: 'Put your fist under your chin.'"),
+          k("Fist under the chin",["chin","chest","under","neck"],"Say where: under the chin."),
+          k("Say 'Tuck your chin and squeeze'",["tuck","squeeze","press","push down","look down","bend","chin down"],"Say: 'Chin down. Squeeze.'",{critical:true}),
+          k("Relax at once, no hold",["straight away","immediately","quickly","right away","no need to hold","don't hold","dont hold","then relax","and relax","release"],"Say: 'Squeeze, then relax at once.'"),
+          k("Say the number: 10 times",["10","ten"],"Say: '10 times.'"),
+          k("Say 'Keep breathing' or 'Shoulders down'",["breath","breathe","count","shoulder"],"Say: 'Keep breathing. Shoulders down.'")],
+  warn:[k("Telling him to hold",["hold for","hold 10","hold it for","hold 5"],"Mr F does NOT hold. Squeeze, then relax at once.")],
+  unsafe:[k("Telling him to hold his breath",["hold your breath","don't breathe","dont breathe"],"Never say 'hold your breath'. Say 'keep breathing'.")],
+  delivery:true, model:"Mr F, chin exercise, okay? Fist under your chin. Chin down. Squeeze. Relax. Keep breathing. Again. We do 10 times."},
+ "g.instruct":{
+  checks:[k("Explain the exercise",["going to","we will","we'll","today we","exercise","help your swallow","help you swallow","cold spoon"],"Explain in one short line: 'We do the cold spoon exercise.'"),
+          k("Say 'Open your mouth'",["open"],"Say: 'Open your mouth.'"),
+          k("Say the spoon is cold",["cold","spoon","ice"],"Say: 'The spoon is cold.'"),
+          k("Press the middle of the tongue",["press","push","tongue","middle"],"Say: 'I press your tongue.'"),
+          k("Say the number: 5 times",[" 5 ","5 times","five"],"Say: '5 times.'"),
+          k("Spoon out first, then 'Swallow'",["take out","remove","spoon out","close your mouth","then swallow","now swallow","after that swallow"],"Take the spoon out first. Then say: 'Now swallow.'",{critical:true})],
+  unsafe:[k("Giving water or food",["drink","sip","water to swallow","some water"],"Use only the cold spoon. Do not give water.")],
+  delivery:true, model:"Good morning, Mdm G. We do the cold spoon exercise. Okay? Open your mouth. I press your tongue 5 times. It is cold. Close your mouth. Now swallow."},
+ "b.respond":{
+  checks:[k("STOP the exercise",W.stop,"Say clearly: 'We stop now.'",{critical:true}),
+          k("Keep him sitting up, ask him to cough",["cough","upright","sit up","clear your throat","sit straight"],"Say: 'Sit up. Cough for me.'"),
+          k("TELL the nurse: not suitable for exercise today",NS.concat(W.nurse),"Tell the nurse: 'Mr B is not suitable for exercise today.'"),
+          k("DOCUMENT it",W.doc,"Say: 'I will document it.'")],
+  unsafe:[k("Continuing the exercise",["continue","carry on","finish the set","one more","few more","next trial","another one","try again","keep going"],"Wet voice = STOP. Do not finish the set."),k("Giving water",["drink","sip","water"],"Do not give water. It can go into the airway.")],
+  model:"Mr B, we stop now. Sit up. Cough for me. Sister, Mr B is not suitable for exercise today. I will document it."},
+ "c.respond":{
+  checks:[k("Say 'Shoulders down'",["shoulder"],"Say: 'Shoulders down. Relax.'",{critical:true}),
+          k("Say 'Keep breathing' or count together",["breath","breathe","count"],"Say: 'Keep breathing. Count with me.'"),
+          k("Show her how",W.demo,"Show her: 'Watch me. Like this.'"),
+          k("Praise her",W.praise,"When she does it right, say: 'Very good!'"),
+          k("Continue the exercise",["again","continue","next one","carry on","let's try","try again","one more time"],"Then continue: 'Let's do the next one.'")],
+  warn:[k("Stopping the session",["stop the session","stop the exercise","stop here","inform the nurse"],"This is a wrong movement, not a stop sign. Fix it and continue.")],
+  unsafe:[k("Telling her to hold her breath or push harder",["hold your breath","push harder","squeeze harder"],"Do not say 'hold your breath' or 'push harder'.")],
+  model:"Mdm C, shoulders down. Like me. Relax. Keep breathing. Count with me. Chin down, squeeze. 1, 2, 3... Very good! Next one."},
+ "d.respond":{
+  checks:[k("Stay calm",W.calm,"Stay calm. Say: 'It's okay. Relax.'"),
+          k("Do not pull. Wait.",["wait","don't pull","dont pull","not pull","won't pull","no pulling","leave it"],"Do not pull. Wait for his mouth to relax.",{critical:true}),
+          k("Take the spoon out slowly",["gently","slowly","remove","take out","take it out"],"When he lets go, take the spoon out slowly."),
+          k("STOP the exercise",W.stop,"Stop the exercise for today."),
+          k("TELL the nurse: not suitable for exercise today",NS.concat(W.nurse),"Tell the nurse: 'Mr D is not suitable for exercise today.'"),
+          k("DOCUMENT it",W.doc,"Say: 'I will document it.'")],
+  unsafe:[k("Pulling or forcing",["pull","yank","force","pry","prise","open his mouth"],"Never pull or force. You can hurt his teeth.")],
+  model:"It's okay, Mr D. Relax. I wait. ... Good. I take the spoon out slowly. We stop now. Sister, Mr D is not suitable for exercise today. I will document it."},
+ "e.respond":{
+  checks:[k("Be kind, say thank you",["thank","good question","i understand","understand","you care","i know you"],"Start kindly: 'Thank you. I know you want her to get better.'"),
+          k("Say the ST decides",["speech therap","therapist"," st ","prescri"],"Say: 'The speech therapist decides how many sets.'",{critical:true}),
+          k("Say you cannot change it",["can't","cannot","not able","not allowed","not change","must follow","keep to","stick to","follow"],"Say: 'I cannot change it.'"),
+          k("Offer to ask the ST",["ask","check with","pass","let her know","let him know","tell","inform","contact"],"Say: 'I will ask the ST for you.'"),
+          k("Continue the same amount",["2 sets","two sets","as prescribed","prescribed","continue","carry on"],"Say: 'Today we do 2 sets.'")],
+  unsafe:[k("Agreeing to more sets",["i'll add","i will add","we can do more","can do 5","we do 5","let's do 5","sure can","ok can","okay can","can lah","do more"],"Only the ST can change it. Too much can make the muscles tired.")],
+  model:"Thank you. I know you want your mother to get better. The speech therapist decides 2 sets. I cannot change it. I will ask the therapist for you. Today we do 2 sets."},
+ "f.respond":{
+  checks:[k("STOP the exercise",W.stop,"Say clearly: 'We stop now.'",{critical:true}),
+          k("Ask about the pain, let him rest",["where","comfortable","rest","sit back","pain","hurt","okay?"],"Ask: 'Where is the pain?' Let him rest."),
+          k("TELL the nurse: not suitable for exercise today",NS.concat(W.nurse),"Tell the nurse: 'Mr F is not suitable for exercise today.'"),
+          k("DOCUMENT it",W.doc,"Say: 'I will document it.'")],
+  unsafe:[k("Continuing",["continue","carry on","one more","few more","push through","keep going","try again","finish"],"Neck pain = STOP, even small pain."),k("Massaging his neck",["massage","rub your neck","rub his neck"],"Do not massage. Let the nurse check.")],
+  model:"Mr F, we stop now. Where is the pain? Sit back and rest. Sister, Mr F is not suitable for exercise today. I will document it."},
+ "g.respond":{
+  checks:[k("Praise her",W.praise,"Say: 'Very good!'",{critical:true}),
+          k("Ask if she is okay",["okay?","ok?","comfortable","alright","are you ok","you okay","can or not"],"Ask: 'Are you okay?'"),
+          k("Say what is next",["next","again","another","one more","let's","we do"],"Say: 'Next one.'"),
+          k("Dip the spoon again",["dip","ice","cold again","shake"],"Dip the spoon in ice water again. Shake off the water."),
+          k("Count: 8 times in total",["2","second","8","eight","more to go","count","7 more","seven more"],"Count: '1 done, 7 more.'")],
+  warn:[k("Stopping for no reason",["stop","inform the nurse","tell the nurse"],"No stop signs here. Saying 'cold' is normal.")],
+  model:"Very good, Mdm G! Yes, the spoon is cold. Are you okay? I dip the spoon again. 1 done, 7 more. Open your mouth."}
+};
+for(const c of CASES){ for(const kind of ["escalate","instruct","respond"]) if(c[kind] && RUB[c.id+"."+kind]) c[kind].keys = RUB[c.id+"."+kind].checks.map(x=>x.label); }
+
+function norm(t){
+  const nums={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10};
+  return " "+t.toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z0-9'?\s]/g," ").replace(/\b(one|two|three|four|five|six|seven|eight|nine|ten)\b/g,(m)=>m+" "+nums[m]).replace(/\s+/g," ")+" ";
+}
+function hit(s, any, negAware){
+  return any.some(p=>{
+    const q=p.toLowerCase(); let i=s.indexOf(q);
+    while(i>-1){ if(!negAware) return true;
+      const before=s.slice(Math.max(0,i-12),i);
+      if(!/(not|n't|no|never|dont|wont|cannot|stop) $/.test(before) && !/(not|n't|never|dont|wont) \w+ $/.test(before)) return true;
+      i=s.indexOf(q,i+1); }
+    return false; });
+}
+function ruleMark(c, kind, t){
+  const rub = RUB[c.id+"."+kind]; const s = norm(t);
+  const checks = rub.checks.map(x=>({label:x.label, ok:hit(s,x.any), tip:x.tip, critical:!!x.critical}));
+  if(rub.delivery){
+    const raw = t.trim();
+    const chunks = raw.split(/[.!?,;]+|\b(?:then|now|okay|ok)\b/i).map(x=>x.trim()).filter(Boolean);
+    const avg = chunks.reduce((a,x)=>a+x.split(/\s+/).length,0)/Math.max(1,chunks.length);
+    checks.push({label:"Ask: 'Okay?' before you start", ok:hit(s,W.perm), tip:"Ask before you start: 'Okay?'", delivery:true});
+    checks.push({label:"Short sentences, one step at a time", ok:avg<=12, tip:"Use short sentences. One step, then stop and wait.", delivery:true});
+    const jar = W.jargon.filter(j=>new RegExp("\\b"+j).test(s));
+    checks.push({label:"Simple words (no medical words)", ok:!jar.length, tip: jar.length? `Do not say '${jar[0]}' to the resident. Use simple words.`:"", delivery:true});
+  }
+  const unsafe = (rub.unsafe||[]).filter(x=>hit(s,x.any,true)).map(x=>({label:x.label,tip:x.tip}));
+  const warns = (rub.warn||[]).filter(x=>hit(s,x.any,true)).map(x=>({label:x.label,tip:x.tip}));
+  const got = checks.filter(x=>x.ok).length;
+  let score = Math.round(5*got/checks.length);
+  const critMiss = checks.some(x=>x.critical&&!x.ok);
+  if(critMiss) score=Math.min(score,3);
+  if(warns.length) score=Math.min(score,3);
+  if(unsafe.length) score=Math.min(score,1);
+  const headline = unsafe.length? "Not safe. Read the red box." : score>=5? "Excellent!" : score>=4? "Good. One small thing to fix." : critMiss? "You missed the most important step." : score>=3? "Safe. Some steps are missing." : "Many steps are missing. Try again.";
+  const good = checks.filter(x=>x.ok).map(x=>x.label);
+  const improve = [...checks.filter(x=>!x.ok).sort((a,b)=>(b.critical?1:0)-(a.critical?1:0)).map(x=>x.tip)];
+  return {score, headline, good:good.slice(0,4), improve:improve.slice(0,4), try_saying:rub.model, checks, unsafe, warns, ai:false};
+}
+
+/* ---------- marking ---------- */
+async function mark(c, kind, transcript){
+  const part = c[kind];
+  const prompt = `You are a supportive speech therapist coaching a therapy assistant (TA) in a Singapore nursing home. The TA has just SPOKEN aloud (captured by speech-to-text, so ignore small transcription errors and missing punctuation).
+
+${ROLE_RULES}
+
+Case: ${c.name}, ${c.age}. Prescription: ${Object.entries(c.rx).map(([k,v])=>k+": "+v).join("; ")}.
+Situation: ${kind==="escalate"? c.handover + " The correct decision is NOT to start. " + c.pre.why
+  : kind==="instruct"? c.handover + " The resident is ready and the TA is giving the first instruction to the resident."
+  : "During the session: " + c.react.obs + " Correct action: " + c.react.answer.toUpperCase() + ". " + c.react.why}
+Task given to the TA: ${part.prompt}
+Key points an excellent answer covers: ${part.keys.join("; ")}.
+
+TA said: """${transcript}"""
+
+Mark it out of 5 (5 = safe, clear and complete; 3 = safe but missing key points; 0-1 = unsafe, e.g. continuing after a stop sign, changing the prescription, wrong dose). Judge both content (safety, accuracy to the prescription, staying in the TA role) and delivery (short sentences, one step at a time, simple words, kind tone, asks permission where relevant. Do NOT mark down for not using the resident's name).
+The TA may be a foreign worker with basic English. Write all feedback in very simple English: short sentences, common words, no idioms. Do not mark down grammar mistakes; judge safety and clarity only.
+Reply with JSON only: {"score": number 0-5, "headline": "one short sentence verdict", "good": ["up to 3 specific things they did well, quoting their words where useful"], "improve": ["up to 3 specific, practical fixes"], "try_saying": "a model version of what to say, in natural spoken Singapore English, under 60 words"}`;
+  const rule = ruleMark(c, kind, transcript);
+  if(sample){
+    try{
+      const r = await sample.json(prompt,{modelTier:"default"});
+      if(r && typeof r.score==="number") return {...r, score:Math.max(0,Math.min(5,Math.round(r.score))), checks:rule.checks, unsafe:rule.unsafe, warns:rule.warns, ai:true};
+    }catch(e){ if(e && e.code==="not_granted") sample=null; }
+  }
+  return rule;
+}
+/* ---------- views ---------- */
+function render(){
+  if(state.view==="case") return renderCase();
+  const tab = state.view;
+  app.innerHTML = `
+  <div class="top"><div><p class="eyebrow">More Hands, Safer Swallows</p><h1>Bedside practice</h1></div>
+    <div class="tabs" role="group" aria-label="View"><button data-v="home" aria-pressed="${tab==="home"}">Practice</button><button data-v="progress" aria-pressed="${tab==="progress"}">Results</button></div></div>
+  ${tab==="home"? homeHTML() : progressHTML()}`;
+  app.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{state.view=b.dataset.v;render();});
+  if(tab==="home"){
+    const ini = document.getElementById("ini");
+    ini.oninput = () => { state.initials = ini.value.toUpperCase().replace(/[^A-Z]/g,"").slice(0,4); ini.value=state.initials; try{localStorage.setItem("ssp-initials",state.initials);}catch(e){} app.querySelectorAll(".case").forEach(b=>b.disabled=!state.initials); };
+    app.querySelectorAll(".case").forEach(b=>b.onclick=()=>openCase(b.dataset.id));
+    const ca=document.getElementById("copyAll"); if(ca) ca.onclick=()=>copyText(document.getElementById("allres"),document.getElementById("copiedAll"));
+  }
+}
+function homeHTML(){
+  return `
+  <p class="muted">Practise talking to residents. The page checks your answer and helps you.</p>
+  <ol class="howto" aria-label="How it works"><li><b>1</b>Check</li><li><b>2</b>Speak</li><li><b>3</b>Watch</li><li><b>4</b>Act</li></ol>
+  <div class="panel">
+    <label for="ini">Step 1: Type your initials</label>
+    <input type="text" id="ini" value="${esc(state.initials)}" placeholder="e.g. TKL" autocomplete="off" inputmode="text">
+    <p class="hint">Example: TKL. Do not type your full name.</p>
+  </div>
+  <div class="safety" aria-label="Stop sign response"><div>STOP<small>the exercise</small></div><div>TELL<small>the nurse: "not suitable for exercise today"</small></div><div>DOCUMENT<small>write it down</small></div></div>
+  <h2>Step 2: Choose a resident</h2>
+  <div class="cases">${CASES.map(c=>`
+    <button class="case" data-id="${c.id}" ${state.initials?"":"disabled"}>
+      <span class="av">${resident(c)}</span>
+      <span class="meta"><b>${esc(c.name)}, ${c.age}</b><span>${esc(c.rx.Exercise)}</span></span>
+      ${done[c.id]!=null? `<span class="pill done">${done[c.id]}/10</span>` : `<span class="pill">${esc(c.ex)}</span>`}
+    </button>`).join("")}</div>
+  ${Object.keys(lines).length? `<div class="panel"><h3>My results</h3><p class="resline" id="allres">${CASES.filter(c=>lines[c.id]).map(c=>esc(lines[c.id])).join("<br>")}</p>
+    <div><button class="btn ghost" id="copyAll" style="padding:8px 12px;font-size:.9rem">Copy</button> <span class="hint" id="copiedAll"></span></div>
+    <p class="hint">Tap Copy. Paste in WhatsApp to your ST.</p></div>`:""}
+  <p class="hint">These residents are not real. Turn on your phone sound.</p>`;
+}
+function progressHTML(){
+  if(!db) return `<div class="panel"><h3>How to send your results</h3><ol class="kbd"><li>Finish a resident.</li><li>Tap <b>Copy</b>.</li><li>Open WhatsApp. Paste and send to your ST.</li></ol></div>`;
+  if(!attempts.length) return `<div class="panel"><h3>No attempts yet</h3><p class="muted">When TAs finish a resident, their score appears here by initials, newest first.</p></div>`;
+  const by = {};
+  attempts.forEach(a=>{ (by[a.initials] ||= []).push(a); });
+  const rows = Object.entries(by).map(([ini,list])=>{
+    const avg = (list.reduce((s,a)=>s+a.score,0)/list.length).toFixed(1);
+    const uniq = new Set(list.map(a=>a.caseId)).size;
+    const missed = list.filter(a=>!a.decisionOk).length;
+    return `<tr><td><b>${esc(ini)}</b></td><td>${uniq}/${CASES.length}</td><td>${avg}</td><td>${missed}</td><td>${new Date(Math.max(...list.map(a=>a.at))).toLocaleDateString("en-SG",{day:"numeric",month:"short"})}</td></tr>`;}).join("");
+  const recent = attempts.slice(0,12).map(a=>{const c=CASES.find(x=>x.id===a.caseId);return `<tr><td>${esc(a.initials)}</td><td>${esc(c?c.name:a.caseId)}</td><td>${a.score}/10</td><td>${a.decisionOk?"✓":"<b style='color:var(--stop)'>Missed</b>"}</td></tr>`;}).join("");
+  return `<div class="panel"><h3>By TA</h3><div class="tablewrap"><table><thead><tr><th>TA</th><th>Residents done</th><th>Avg /10</th><th>Wrong calls</th><th>Last</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="hint">A wrong call means the TA continued when they should have stopped, or the other way round. Follow these up first.</p></div>
+  <div class="panel"><h3>Latest attempts</h3><div class="tablewrap"><table><thead><tr><th>TA</th><th>Resident</th><th>Score</th><th>Stop/go call</th></tr></thead><tbody>${recent}</tbody></table></div></div>`;
+}
+
+function openCase(id){
+  if(!state.initials) return;
+  state.view="case"; state.caseId=id;
+  state.run = { stage:0, preChoice:null, reactChoice:null, marks:{}, face:"neutral" };
+  render(); window.scrollTo(0,0);
+}
+function caseScore(c,r){
+  const preOk = r.preChoice===c.pre.answer;
+  if(c.pre.answer==="no"){ const m=r.marks.escalate?.score??0; return {score:Math.round(((preOk?4:0)+m*1.2)), ok:preOk}; }
+  const reactOk = r.reactChoice===c.react.answer;
+  const pts = (preOk?1:0) + (reactOk?3:0) + (r.marks.instruct?.score??0)*0.6 + (r.marks.respond?.score??0)*0.6;
+  return {score:Math.round(pts), ok:preOk&&reactOk};
+}
+
+function fbHTML(m){
+  const cls = m.unsafe?.length? "bad" : m.score>=4?"good":m.score>=3?"mid":"bad";
+  const list = (arr)=>`<ul class="checks">${arr.map(x=>`<li class="${x.ok?"ok":"no"}"><span aria-hidden="true">${x.ok?"✓":"✗"}</span><span>${esc(x.label)}${x.critical?' <span class="key">Key step</span>':""}</span></li>`).join("")}</ul>`;
+  const content = (m.checks||[]).filter(x=>!x.delivery), delivery = (m.checks||[]).filter(x=>x.delivery);
+  const fixes = m.ai ? (m.improve||[]) : (m.improve||[]).slice(0,2);
+  return `<div class="fb ${cls}" role="status">
+    <div class="head"><b>${esc(m.headline||"")}</b><span class="score">${m.score}/5</span></div>
+    ${(m.unsafe||[]).map(u=>`<p class="alertbox"><b>Not safe: ${esc(u.label)}.</b> ${esc(u.tip)}</p>`).join("")}
+    ${(m.warns||[]).map(u=>`<p class="warnbox"><b>Check: ${esc(u.label)}.</b> ${esc(u.tip)}</p>`).join("")}
+    ${fixes.length?`<div><span class="eyebrow" style="color:var(--stop)">${m.ai?"To improve":"Fix this"}</span><ul>${fixes.map(g=>`<li>${esc(g)}</li>`).join("")}</ul></div>`:""}
+    ${m.ai&&m.good?.length?`<div><span class="eyebrow" style="color:var(--go)">What worked</span><ul>${m.good.map(g=>`<li>${esc(g)}</li>`).join("")}</ul></div>`:""}
+    ${content.length?`<details ${m.ai?"":"open"}><summary>What you said</summary>${list(content)}</details>`:""}
+    ${delivery.length?`<details ${m.ai?"":"open"}><summary>How you said it</summary>${list(delivery)}</details>`:""}
+    ${m.try_saying?`<div><span class="eyebrow">Better way to say it</span><p class="try">"${esc(m.try_saying)}"</p><button class="btn ghost" data-hear="${esc(m.try_saying)}" style="margin-top:6px;padding:8px 12px;font-size:.9rem">🔊 Listen</button></div>`:""}
+  </div>`;
+}
+function decisionHTML(ok, why){
+  return `<div class="fb ${ok?"good":"bad"}" role="status"><div class="head"><b>${ok?"Correct!":"Not correct."}</b></div><p>${esc(why)}</p></div>`;
+}
+function speakBox(id, prompt, kind){
+  return `<div class="panel" id="sb-${id}">
+    <h3>${esc(prompt)}</h3>
+    <div class="mic"><button class="micbtn" id="mic-${id}" aria-label="Tap to speak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+    <p class="miclabel" id="lab-${id}" aria-live="polite">Tap to speak</p></div>
+    <p class="note" id="note-${id}" hidden>Tap 🎤 on your keyboard and speak. When you finish, tap the big button again.</p>
+    <textarea id="ta-${id}" aria-label="Your words" placeholder="Your words" ${""}></textarea>
+    <div id="out-${id}"></div>
+  </div>`;
+}
+function wireSpeak(id, c, kind, after){
+  const ta=document.getElementById("ta-"+id), btn=document.getElementById("mic-"+id), label=document.getElementById("lab-"+id), note=document.getElementById("note-"+id), out=document.getElementById("out-"+id);
+  if(!ta) return;
+  const r = state.run;
+  if(r.marks[kind]){ ta.value=r.marks[kind].transcript; ta.readOnly=true; btn.disabled=true; label.textContent="You said:"; out.innerHTML=fbHTML(r.marks[kind]); wireHear(out); return; }
+  const ctl = {mode:"idle", btn, ta, label, note, submit: async()=>{
+    btn.disabled=true; ta.readOnly=true; note.hidden=true; label.textContent="You said:";
+    out.innerHTML=`<div class="thinking"><span class="dot"></span>Checking your answer…</div>`;
+    const m = await mark(c, kind, ta.value.trim());
+    m.transcript = ta.value.trim(); r.marks[kind]=m;
+    after();
+  }};
+  btn.onclick=()=>micTap(ctl);
+}
+function wireHear(root){ root.querySelectorAll("[data-hear]").forEach(b=>b.onclick=()=>speak(b.dataset.hear)); }
+
+function renderCase(){
+  const c = CASES.find(x=>x.id===state.caseId), r = state.run;
+  const noStart = c.pre.answer==="no";
+  const stagesN = noStart?2:4;
+  let face = r.face;
+  const showReact = !noStart && r.stage>=2;
+  if(showReact) face = c.react.state;
+  if(noStart && r.preChoice) face = c.id==="a"?"drowsy":"neutral";
+  let html = `
+  <button class="back" id="back">← Back</button>
+  <ol class="steps" aria-label="Steps">${(noStart?["Check","Tell nurse"]:STAGES).map((l,i)=>`<li class="${i<=r.stage?"on":""} ${i===r.stage?"now":""}">${i+1}. ${l}</li>`).join("")}</ol>
+  <div class="panel">
+    <div class="bed"><div>${resident(c, c.id==="a"&&r.preChoice? "drowsy" : face)}</div>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+        <p class="eyebrow">Step ${r.stage+1}: ${noStart?["Check","Tell nurse"][Math.min(r.stage,1)]:STAGES[Math.min(r.stage,3)]}</p>
+        <h2>${esc(c.name)}, ${c.age}</h2>
+        ${showReact? `<p class="say alert">${esc(c.react.say)}</p><button class="btn ghost" id="hearRes" style="padding:6px 10px;font-size:.85rem;align-self:flex-start">🔊 Listen to ${esc(c.react.say.startsWith("Daughter")?"the daughter":c.name)}</button>` : ""}
+      </div></div>
+    ${showReact? `<p class="obs"><b>You see:</b> ${esc(c.react.obs)}</p>`:""}
+    <div class="rx"><dl>${Object.entries(c.rx).map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl></div>
+    <p class="handover">${esc(c.handover)}</p>
+  </div>`;
+
+  // Stage 0: pre-check
+  html += `<div class="panel"><h3>Read the plan and the nurse's message. Is it safe to start?</h3>
+    <div class="row"><button class="btn ${r.preChoice==="yes"?"":"ghost"}" data-pre="yes" ${r.preChoice?"disabled":""}>Yes, start</button><button class="btn stop ${r.preChoice==="no"?"":"ghost"}" data-pre="no" ${r.preChoice?"disabled":""}>No, do not start</button></div>
+    ${r.preChoice? decisionHTML(r.preChoice===c.pre.answer, c.pre.why) : ""}
+    ${r.preChoice && r.stage===0? `<button class="btn" id="next0">Next</button>`:""}
+  </div>`;
+
+  if(noStart && r.stage>=1) html += speakBox("esc", c.escalate.prompt);
+  if(!noStart && r.stage>=1) html += speakBox("ins", c.instruct.prompt);
+  if(!noStart && r.stage===1 && r.marks.instruct) html += `<button class="btn" id="next1">Next: watch ${esc(c.name)}</button>`;
+  if(!noStart && r.stage>=2){
+    html += `<div class="panel"><h3>Look at the resident. What do you do?</h3>
+      <div class="row">
+        ${[["continue","Continue"],["correct","Fix the movement, then continue"],["stop","STOP"]].map(([v,l])=>`<button class="btn ${v==="stop"?"stop":""} ${r.reactChoice===v?"":"ghost"}" data-react="${v}" ${r.reactChoice?"disabled":""}>${l}</button>`).join("")}
+      </div>
+      ${r.reactChoice? decisionHTML(r.reactChoice===c.react.answer, c.react.why):""}
+      ${r.reactChoice && r.stage===2? `<button class="btn" id="next2">Next</button>`:""}
+    </div>`;
+  }
+  if(!noStart && r.stage>=3) html += speakBox("res", c.respond.prompt);
+  const finished = noStart? !!r.marks.escalate : !!r.marks.respond;
+  if(finished){
+    const sc = caseScore(c,r);
+    html += `<div class="panel" style="border-color:var(--teal)"><p class="eyebrow">${esc(c.name)}: finished</p>
+      <div class="row" style="align-items:center"><span class="big">${sc.score}<span style="font-size:1.2rem">/10</span></span><p style="flex:1 1 200px"><b>Remember:</b> ${esc(c.learn)}</p></div>
+      <div><span class="eyebrow">Send to your ST</span><p class="resline" id="resline">${esc(resultLine(c,r,sc))}</p>
+      <button class="btn ghost" id="copyRes" style="margin-top:6px;padding:8px 12px;font-size:.9rem">Copy</button> <span class="hint" id="copied"></span></div>
+      <p class="hint" id="saved">${db?"Saving your score…":"Tap Copy. Paste in WhatsApp to your ST."}</p>
+      <div class="row"><button class="btn ghost" id="again">Try again</button><button class="btn" id="nextCase">${nextCase(c)?"Next resident":"Back to residents"}</button></div></div>`;
+  }
+  app.innerHTML = html;
+
+  document.getElementById("back").onclick=()=>{ if(rec) rec.stop(); state.view="home"; render(); };
+  app.querySelectorAll("[data-pre]").forEach(b=>b.onclick=()=>{ r.preChoice=b.dataset.pre; renderCase(); });
+  const n0=document.getElementById("next0"); if(n0) n0.onclick=()=>{ r.stage=1; renderCase(); scrollLast(); };
+  const n1=document.getElementById("next1"); if(n1) n1.onclick=()=>{ r.stage=2; renderCase(); speak(c.react.say); window.scrollTo({top:0,behavior:"smooth"}); };
+  app.querySelectorAll("[data-react]").forEach(b=>b.onclick=()=>{ r.reactChoice=b.dataset.react; renderCase(); });
+  const n2=document.getElementById("next2"); if(n2) n2.onclick=()=>{ r.stage=3; renderCase(); scrollLast(); };
+  const hr=document.getElementById("hearRes"); if(hr) hr.onclick=()=>speak(c.react.say);
+  if(noStart) wireSpeak("esc",c,"escalate",()=>{ renderCase(); scrollLast(); });
+  else { wireSpeak("ins",c,"instruct",()=>{ renderCase(); scrollLast(); }); wireSpeak("res",c,"respond",()=>{ renderCase(); scrollLast(); }); }
+  wireHear(app);
+  if(finished){
+    const sc = caseScore(c,r);
+    document.getElementById("again").onclick=()=>openCase(c.id);
+    document.getElementById("copyRes").onclick=()=>copyText(document.getElementById("resline"), document.getElementById("copied"));
+    document.getElementById("nextCase").onclick=()=>{ const n=nextCase(c); n? openCase(n.id) : (state.view="home", render()); };
+    if(!r.saved){ r.saved=true; saveAttempt(c, sc); }
+    else if(db) document.getElementById("saved").textContent = "Score saved.";
+  }
+}
+function resultLine(c,r,sc){
+  const d = new Date().toLocaleDateString("en-SG",{day:"numeric",month:"short"});
+  const parts = [ `Start/no-start ${r.preChoice===c.pre.answer?"correct":"WRONG"}` ];
+  if(c.pre.answer==="no") parts.push(`Told nurse ${r.marks.escalate?.score??"-"}/5`);
+  else { parts.push(`Instruction ${r.marks.instruct?.score??"-"}/5`, `Stop/go call ${r.reactChoice===c.react.answer?"correct":"WRONG"}`, `Next steps ${r.marks.respond?.score??"-"}/5`); }
+  const flag = Object.values(r.marks).some(m=>m.unsafe?.length) ? " | UNSAFE phrase flagged" : "";
+  return `Safer Swallows | ${state.initials} | ${c.name} | ${sc.score}/10 | ${parts.join(", ")}${flag} | ${d}`;
+}
+function copyText(el, msg){
+  const t = el.textContent;
+  const sel = () => { const rg=document.createRange(); rg.selectNodeContents(el); const ss=getSelection(); ss.removeAllRanges(); ss.addRange(rg); msg.textContent="Selected. Use your phone's Copy."; };
+  try{ navigator.clipboard.writeText(t).then(()=>{ msg.textContent="Copied."; }, sel); }catch(e){ sel(); }
+}
+function nextCase(c){ const i=CASES.indexOf(c); return CASES[i+1]||null; }
+function scrollLast(){ const p=app.querySelectorAll(".panel"); p[p.length-1]?.scrollIntoView({behavior:"smooth",block:"start"}); }
+async function saveAttempt(c, sc){
+  done[c.id]=sc.score; lines[c.id]=resultLine(c,state.run,sc);
+  try{ localStorage.setItem("ssp-done",JSON.stringify(done)); localStorage.setItem("ssp-lines",JSON.stringify(lines)); }catch(e){}
+  const el=document.getElementById("saved");
+  if(!db) return;
+  try{
+    await db.collection("attempts").add({initials:state.initials, caseId:c.id, score:sc.score, decisionOk:sc.ok, at:Date.now()});
+    if(el) el.textContent="Score saved for your ST.";
+  }catch(e){ if(el) el.textContent="Couldn't save to the team record. Your score is kept on this phone."; }
+}
+
+render();
+(async()=>{
+  try{ sample = await window.claude?.use?.("sample"); }catch(e){ sample=null; }
+  try{ db = await window.claude?.use?.("db"); }catch(e){ db=null; }
+  if(db){
+    db.collection("attempts").orderBy("at","desc").limit(300).onSnapshot(snap=>{
+      attempts = snap.docs.map(d=>d.data()).filter(a=>a&&a.initials);
+      if(state.view==="progress") render();
+    }, ()=>{});
+  }
+  if(state.view==="progress") render();
+})();
+</script>
+
+</body></html>
