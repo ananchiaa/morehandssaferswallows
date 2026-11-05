@@ -136,13 +136,13 @@ const CASES = [
     rx:{Exercise:"TTS (cold spoon on the throat arch)",How:"Rub left side, then right side, 5 times. Then say 'Swallow'.",Amount:"10 times, 1 time a day",Tool:"Metal spoon in ice water"},
     handover:"Nurse says: \"Mdm A has fever this morning (38.2°C). She is more sleepy than usual.\"",
     pre:{answer:"no",why:"Fever and sleepy are 'do not start' signs. A sleepy person cannot swallow safely."},
-    escalate:{prompt:"You do not start. What do you say to the nurse?"},
+    escalate:{prompt:"You do not start. What do you say?"},
     learn:"Fever or sleepy = do not start. Tell the nurse: 'not suitable for exercise today'. DOCUMENT." },
   { id:"r", name:"Mr R", age:79, ex:"CTAR", look:{hair:"short",glasses:true},
     rx:{Exercise:"CTAR (chin tuck with a ball)",How:"Ball under chin. Squeeze and hold 10 seconds.",Amount:"3 sets of 5",Position:"Sit up straight, back supported"},
     handover:"Nurse says: \"Mr R came back from hospital yesterday. He had a chest infection. He looks happy today.\"",
     pre:{answer:"no",why:"He just came back from hospital. The ST must check him first. His exercises may change."},
-    escalate:{prompt:"You do not start. What do you say to the nurse?"},
+    escalate:{prompt:"You do not start. What do you say?"},
     learn:"Back from hospital = wait for the ST to check first, even if he looks well." },
   { id:"b", name:"Mr B", age:81, ex:"TTS", look:{hair:"bald",glasses:false},
     rx:{Exercise:"TTS (cold spoon on the throat arch)",How:"Rub left side, then right side, 5 times. Then say 'Swallow'.",Amount:"10 times",Tool:"Metal spoon in ice water"},
@@ -150,7 +150,7 @@ const CASES = [
     pre:{answer:"yes",why:"He is well and awake, and his mouth is clean. It is safe to start."},
     instruct:{prompt:"Mr B is sitting up. Say hello, explain the exercise, and give the first instruction."},
     react:{state:"wet",say:"Okay... (his voice sounds wet, like gargling)",obs:"After the 3rd swallow, his voice sounds wet and gurgly. He clears his throat 2 times.",answer:"stop",why:"A wet, gurgly voice is a STOP sign. Food or saliva may be near his airway."},
-    respond:{prompt:"What do you do now? What do you say to the nurse?"},
+    respond:{prompt:"What do you do now? What do you say?"},
     learn:"Wet voice = STOP, TELL the nurse, DOCUMENT. Do not finish the set." },
   { id:"c", name:"Mdm C", age:76, ex:"CTAR", look:{hair:"long",glasses:true},
     rx:{Exercise:"CTAR (chin tuck with a ball)",How:"Ball under chin. Squeeze and hold 10 seconds.",Amount:"3 sets of 5",Position:"Sit up straight, back supported"},
@@ -166,7 +166,7 @@ const CASES = [
     pre:{answer:"yes",why:"Moving around a bit is not a stop sign. He is well and awake. Start, and watch him closely."},
     instruct:{prompt:"Explain the tongue push exercise to Mr D and give the first instruction."},
     react:{state:"bite",say:"Nngh! (he bites the spoon hard)",obs:"He bites the spoon very hard and does not let go.",answer:"stop",why:"A strong bite is a STOP sign. Never pull the spoon. Wait for his mouth to relax."},
-    respond:{prompt:"What do you do now? Who do you tell?"},
+    respond:{prompt:"What do you do now? What do you say?"},
     learn:"Strong bite: do not pull. Wait, take the spoon out slowly. STOP, TELL the nurse, DOCUMENT." },
   { id:"e", name:"Mdm E", age:73, ex:"OME", look:{hair:"bun",glasses:true}, family:true,
     rx:{Exercise:"OME (lip exercise)",How:"Say 'OO' then 'EE', 10 times. Puff cheeks and hold 3 seconds, 5 times.",Amount:"2 sets",Tool:"Mirror"},
@@ -182,7 +182,7 @@ const CASES = [
     pre:{answer:"yes",why:"No warning signs today."},
     instruct:{prompt:"Give Mr F the instruction for the chin tuck."},
     react:{state:"pain",say:"Aiyo, my neck pain leh... (he rubs his neck)",obs:"On the 4th time, his face shows pain. He says his neck hurts.",answer:"stop",why:"Neck pain is a STOP sign. Do not continue, even if it is 'only a little' pain."},
-    respond:{prompt:"What do you do now? Who do you tell?"},
+    respond:{prompt:"What do you do now? What do you say?"},
     learn:"Pain in neck, jaw or chest = STOP, TELL, DOCUMENT, even small pain." },
   { id:"g", name:"Mdm G", age:80, ex:"CSP", look:{hair:"long",glasses:false},
     rx:{Exercise:"CSP (cold spoon on the tongue)",How:"Press the middle of the tongue 5 times. Then say 'Swallow'.",Amount:"8 times",Tool:"Metal spoon in ice water"},
@@ -310,16 +310,14 @@ const W = {
 const k = (label, any, tip, opt={}) => ({label, any, tip, ...opt});
 const RUB = {
  "a.escalate":{
-  checks:[k("Tell the nurse: not suitable for exercise today",W.noStart,"Tell the nurse: 'Mdm A is not suitable for exercise today.'",{critical:true}),
-          k("Talk to the nurse",W.nurse,"Speak to the nurse in charge.")],
+  checks:[k("Say: not suitable for exercise today",W.noStart,"Say: \'Mdm A is not suitable for exercise today.\'",{critical:true})],
   unsafe:[k("Doing the exercise when she is sick",["start anyway","go ahead","still do","just do","quick one","try a few","try a little","do a short","do half"],"She has fever and is sleepy. Do not do any exercise today.")],
-  model:"Sister, Mdm A is not suitable for exercise today."},
+  model:"Mdm A is not suitable for exercise today."},
  "r.escalate":{
-  checks:[k("Tell the nurse: not suitable for exercise today",W.noStart,"Tell the nurse: 'Mr R is not suitable for exercise today.'",{critical:true}),
-          k("Talk to the nurse",W.nurse,"Speak to the nurse in charge."),
+  checks:[k("Say: not suitable for exercise today",W.noStart,"Say: \'Mr R is not suitable for exercise today.\'",{critical:true}),
           k("The ST must check him first",["speech therap","therapist"," st ","review","assess","see him first","check him first"],"Say: 'I will tell the ST to check him first.'")],
   unsafe:[k("Starting because he looks well",["start anyway","go ahead","still do","just do","looks fine so","seems ok so","seems okay so","quick one","try a few"],"Even if he looks well, wait for the ST after hospital.")],
-  model:"Sister, Mr R is not suitable for exercise today. I will tell the speech therapist to check him first."},
+  model:"Mr R is not suitable for exercise today. I will tell the speech therapist to check him first."},
  "b.instruct":{
   checks:[k("Explain the exercise",["going to","we will","we'll","today we","exercise","help your swallow","help you swallow","cold spoon"],"Explain in one short line: 'We do the cold spoon exercise.'"),
           k("Say 'Open your mouth'",["open"],"Say: 'Open your mouth.'"),
@@ -377,9 +375,9 @@ const RUB = {
  "b.respond":{
   checks:[k("STOP the exercise",W.stop,"Say clearly: 'We stop now.'",{critical:true}),
           k("Keep him sitting up, ask him to cough",["cough","upright","sit up","clear your throat","sit straight"],"Say: 'Sit up. Cough for me.'"),
-          k("TELL the nurse: not suitable for exercise today",NS.concat(W.nurse),"Tell the nurse: 'Mr B is not suitable for exercise today.'")],
+          k("Say: not suitable for exercise today",NS,"Say: \'Mr B is not suitable for exercise today.\'")],
   unsafe:[k("Continuing the exercise",["continue","carry on","finish the set","one more","few more","next trial","another one","try again","go again","do again","keep going"],"Wet voice = STOP. Do not finish the set."),k("Giving water",["drink","sip","water"],"Do not give water. It can go into the airway.")],
-  model:"Mr B, we stop now. Sit up. Cough for me. Sister, Mr B is not suitable for exercise today."},
+  model:"Mr B, we stop now. Sit up. Cough for me. Mr B is not suitable for exercise today."},
  "c.respond":{
   checks:[k("Say 'Shoulders down'",["shoulder"],"Say: 'Shoulders down. Relax.'",{critical:true}),
           k("Say 'Keep breathing' or count together",["breath","breathe","count"],"Say: 'Keep breathing. Count with me.'"),
@@ -394,9 +392,9 @@ const RUB = {
           k("Do not pull. Wait.",["wait","don't pull","dont pull","not pull","won't pull","no pulling","leave it"],"Do not pull. Wait for his mouth to relax.",{critical:true}),
           k("Take the spoon out slowly",["gently","slowly","remove","take out","take it out"],"When he lets go, take the spoon out slowly."),
           k("STOP the exercise",W.stop,"Stop the exercise for today."),
-          k("TELL the nurse: not suitable for exercise today",NS.concat(W.nurse),"Tell the nurse: 'Mr D is not suitable for exercise today.'")],
+          k("Say: not suitable for exercise today",NS,"Say: \'Mr D is not suitable for exercise today.\'")],
   unsafe:[k("Pulling or forcing",["pull","yank","force","pry","prise","open his mouth"],"Never pull or force. You can hurt his teeth.")],
-  model:"It's okay, Mr D. Relax. I wait. ... Good. I take the spoon out slowly. We stop now. Sister, Mr D is not suitable for exercise today."},
+  model:"It's okay, Mr D. Relax. I wait. ... Good. I take the spoon out slowly. We stop now. Mr D is not suitable for exercise today."},
  "e.respond":{
   checks:[k("Be kind, say thank you",["thank","good question","i understand","understand","you care","i know you"],"Start kindly: 'Thank you. I know you want her to get better.'"),
           k("Say the ST decides",["speech therap","therapist"," st ","prescri"],"Say: 'The speech therapist decides how many sets.'",{critical:true}),
@@ -408,9 +406,9 @@ const RUB = {
  "f.respond":{
   checks:[k("STOP the exercise",W.stop,"Say clearly: 'We stop now.'",{critical:true}),
           k("Ask about the pain, let him rest",["where","comfortable","rest","sit back","pain","hurt","okay?"],"Ask: 'Where is the pain?' Let him rest."),
-          k("TELL the nurse: not suitable for exercise today",NS.concat(W.nurse),"Tell the nurse: 'Mr F is not suitable for exercise today.'")],
+          k("Say: not suitable for exercise today",NS,"Say: \'Mr F is not suitable for exercise today.\'")],
   unsafe:[k("Continuing",["continue","carry on","one more","few more","push through","keep going","try again","go again","do again","finish"],"Neck pain = STOP, even small pain."),k("Massaging his neck",["massage","rub your neck","rub his neck"],"Do not massage. Let the nurse check.")],
-  model:"Mr F, we stop now. Where is the pain? Sit back and rest. Sister, Mr F is not suitable for exercise today."},
+  model:"Mr F, we stop now. Where is the pain? Sit back and rest. Mr F is not suitable for exercise today."},
  "g.respond":{
   checks:[k("Praise her",W.praise,"Say: 'Very good!'",{critical:true}),
           k("Ask if she is okay",["ok","okay","okay?","ok?","comfortable","alright","are you ok","you okay","can or not"],"Ask: 'Are you okay?'"),
@@ -508,7 +506,7 @@ TA said: """${transcript}"""
 
 Mark it out of 5 (5 = safe, clear and complete; 3 = safe but missing key points; 0-1 = unsafe, e.g. continuing after a stop sign, changing the prescription, wrong dose). Judge both content (safety, accuracy to the prescription, staying in the TA role) and delivery (short sentences, one step at a time, simple words, kind tone, asks permission where relevant. Do NOT mark down for not using the resident's name).
 The TA may be a foreign worker with basic English. Write all feedback in very simple English: short sentences, common words, no idioms. Do not mark down grammar mistakes; judge safety and clarity only.
-Accept Singlish, broken grammar, missing words and wrong verb forms: give full credit when the key point is there in any wording. Do NOT mark down for not saying they will document; documenting is done separately.
+Accept Singlish, broken grammar, missing words and wrong verb forms: give full credit when the key point is there in any wording. Do NOT mark down for not saying they will document; documenting is done separately. The TA does not need to say "nurse" or "sister"; saying the resident is not suitable for exercise today is enough.
 Reply with JSON only: {"score": number 0-5, "headline": "one short sentence verdict", "good": ["up to 3 specific things they did well, quoting their words where useful"], "improve": ["up to 3 specific, practical fixes"], "try_saying": "a model version of what to say, in natural spoken Singapore English, under 60 words"}`;
   const rule = ruleMark(c, kind, transcript);
   if(sample){
